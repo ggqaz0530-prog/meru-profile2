@@ -1,0 +1,2705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MY LOVELY PROFILE</title>
+
+  <!-- Firebase SDK 라이브러리 추가 -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    :root {
+      --bg-color: #fff0f5;
+      --grid-color: #ffd1dc;
+      --accent-color: #ff4d73;
+      --text-color: #5c3a42;
+      --card-border: #ffccd5;
+      --tab-text-color: #ff758c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+        linear-gradient(var(--grid-color) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, var(--grid-color) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 120px;
+      min-height: 100vh;
+      opacity: 1;
+    }
+
+    body.modal-open {
+      overflow: hidden !important;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 3px solid var(--card-border);
+      border-radius: 24px;
+      padding: 6px 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      gap: 10px;
+    }
+
+    .search-input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-color);
+      background: transparent;
+    }
+
+    .search-clear-btn {
+      background: transparent;
+      border: none;
+      color: var(--tab-text-color);
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-results-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border: 3px solid var(--card-border);
+      border-radius: 20px;
+      margin-top: 8px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      max-height: 280px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      z-index: 2500;
+      display: none;
+      flex-direction: column;
+      padding: 8px;
+      gap: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .search-result-item {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #fff8f9;
+      border: 1.5px solid #ffe0e6;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+    }
+
+    .search-result-item:hover { background: #ffe8ec; }
+    .search-result-text { font-size: 0.88rem; font-weight: 700; color: var(--text-color); word-break: break-all; }
+    .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; background: var(--accent-color); color: #ffffff; white-space: nowrap; }
+
+    @keyframes highlightPulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 77, 115, 0.8); }
+      50% { transform: scale(1.02); box-shadow: 0 0 16px rgba(255, 77, 115, 0.8); }
+      100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 77, 115, 0); }
+    }
+    .search-highlight { animation: highlightPulse 1.2s ease-in-out 2; }
+
+    .pagination-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      background: #ffe4e8;
+      border: 1.5px solid var(--card-border);
+      color: var(--accent-color);
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 5px 11px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .page-btn.active {
+      background: var(--accent-color);
+      color: #ffffff;
+      border-color: var(--accent-color);
+      box-shadow: 0 2px 8px rgba(255, 77, 115, 0.3);
+    }
+
+    .page-btn:hover:not(.active):not(:disabled) { background: var(--card-border); }
+
+    .sheet-tabs {
+      display: flex;
+      background: #ffffff;
+      padding: 6px;
+      border-radius: 24px;
+      border: 3px solid var(--card-border);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      gap: 6px;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 10px 0;
+      border: none;
+      background: transparent;
+      border-radius: 18px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--tab-text-color);
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-color);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .tab-content { display: none; flex-direction: column; gap: 18px; width: 100%; }
+    .tab-content.active { display: flex; }
+
+    #tab-main { max-width: 1080px; margin: 0 auto; }
+    #tab-monthly { max-width: 100%; }
+    #tab-achievements { max-width: 720px; margin: 0 auto; }
+    #tab-games { max-width: 720px; margin: 0 auto; }
+    #tab-tmi { max-width: 880px; margin: 0 auto; }
+
+    .main-columns-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      .main-columns-grid { grid-template-columns: 1fr; }
+    }
+
+    .main-col-left, .main-col-right { display: flex; flex-direction: column; gap: 18px; }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 24px;
+      border: 3px solid var(--card-border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    body.admin-mode [contenteditable="true"] {
+      padding: 2px 6px;
+      transition: background 0.2s;
+      min-width: 20px;
+      display: inline-block;
+      border-radius: 6px;
+    }
+    body.admin-mode [contenteditable="true"]:hover { background: #ffe4e8; cursor: text; }
+    body.admin-mode [contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background: #ffffff; }
+
+    [contenteditable="true"] a, .info-text a, .profile-bio a, .game-review-text a, .tmi-content-text a {
+      color: var(--accent-color);
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
+    .profile { text-align: center; }
+    .profile-img-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto 16px; }
+    .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff0f5; border: 4px solid var(--card-border); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); display: block; }
+    .img-upload-btn { position: absolute; bottom: 0; right: -4px; background: var(--accent-color); color: #ffffff; font-size: 0.72rem; padding: 5px 10px; border-radius: 14px; cursor: pointer; font-weight: 700; user-select: none; }
+    .profile h1 { font-size: 1.45rem; font-weight: 800; color: var(--accent-color); margin-bottom: 6px; word-break: break-all; }
+    .profile-bio { font-size: 0.92rem; color: var(--text-color); line-height: 1.6; text-align: center; min-height: 30px; white-space: pre-wrap; word-break: break-all; width: 100%; margin-bottom: 16px; }
+
+    .profile-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      text-align: left;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .profile-info-grid { grid-template-columns: 1fr; }
+      .info-box-item.full-width { grid-column: span 1; }
+    }
+
+    .info-box-item {
+      background: #fff8f9;
+      border: 1.5px solid #ffe0e6;
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-width: 0;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .info-box-item.full-width { grid-column: span 2; }
+    .info-box-label { font-size: 0.78rem; font-weight: 800; color: var(--accent-color); background: #ffe4e8; padding: 4px 10px; border-radius: 12px; white-space: nowrap; outline: none; flex: 0 0 auto; }
+    .info-box-val { font-size: 0.85rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
+
+    #first-stream-text { white-space: nowrap !important; flex-shrink: 0 !important; }
+    body.admin-mode #first-stream-picker { width: 95px !important; padding: 2px 3px !important; font-size: 0.72rem !important; border-radius: 8px !important; }
+    .stream-days-badge { background: var(--accent-color); color: #ffffff; padding: 4px 10px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; display: inline-block; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .section-title { font-size: 1.05rem; font-weight: 800; color: var(--accent-color); display: flex; align-items: center; gap: 6px; }
+
+    .admin-only { display: none !important; }
+    body.admin-mode .admin-only { display: inline-block !important; }
+    body.admin-mode .admin-only.flex { display: flex !important; }
+
+    .card-move-btns { display: flex; gap: 4px; align-items: center; }
+    .move-btn, .resize-btn {
+      background: #ffe4e8;
+      border: 1px solid var(--card-border);
+      color: var(--accent-color);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .move-btn:hover, .resize-btn:hover { background: var(--card-border); }
+    .add-btn { background: #ffe4e8; border: none; color: var(--accent-color); padding: 5px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
+    .add-btn:hover { background: var(--card-border); }
+
+    .list-wrapper { display: flex; flex-direction: column; gap: 10px; }
+    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff8f9; border-radius: 16px; border: 1.5px solid #ffe0e6; gap: 10px; min-width: 0; }
+    .del-btn { background: transparent; border: none; color: #ffb6c1; font-size: 1.1rem; cursor: pointer; padding: 0 4px; font-weight: bold; touch-action: manipulation; user-select: none; }
+    .del-btn:hover { color: var(--accent-color); }
+
+    body.admin-mode .link-anchor, body.admin-mode .schedule-view-box { display: none !important; }
+
+    .link-anchor { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; width: 100%; text-decoration: none; color: var(--accent-color); font-weight: 700; font-size: 0.92rem; cursor: pointer; min-width: 0; }
+    .link-anchor:hover { background: #ffe8ec; }
+    .link-name { min-width: 0; word-break: break-all; }
+
+    .link-edit-box { width: 100%; padding: 4px 0; display: flex; flex-direction: column; gap: 6px; }
+    .url-input, .date-input, .time-text-input, .text-input { width: 100%; padding: 7px 10px; font-size: 0.85rem; border: 1.5px solid var(--card-border); border-radius: 10px; color: var(--text-color); background: #ffffff; }
+    .anniv-date-picker { width: 120px !important; flex-shrink: 0 !important; }
+    .time-text-input { width: 80px; padding: 6px 8px; font-size: 0.82rem; font-weight: 700; text-align: center; }
+
+    .select-input { padding: 6px 10px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid var(--card-border); border-radius: 12px; color: var(--accent-color); background: #ffffff; cursor: pointer; outline: none; }
+
+    body:not(.admin-mode) .game-rating-select {
+      pointer-events: none;
+      border: none !important;
+      background: transparent !important;
+      appearance: none;
+      -webkit-appearance: none;
+      padding: 0 !important;
+      color: var(--accent-color) !important;
+      -webkit-text-fill-color: var(--accent-color) !important;
+      opacity: 1 !important;
+      font-weight: 800;
+      cursor: default;
+    }
+
+    .schedule-view-box { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; min-width: 0; }
+    .schedule-view-box .info-text { flex: 1 1 0; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
+    .schedule-view-box .sub-text { font-size: 0.82rem; font-weight: 800; color: var(--accent-color); white-space: nowrap; flex: 0 0 auto; }
+    .day-badge { font-weight: 800; font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; background: var(--accent-color); color: #ffffff; white-space: nowrap; flex: 0 0 auto; }
+    .anniv-date { font-weight: 800; font-size: 0.82rem; padding: 6px 12px; border-radius: 20px; background: #ffecb3; color: #d97706; white-space: nowrap; flex: 0 0 auto; }
+    .dday-badge { font-weight: 800; font-size: 0.78rem; padding: 5px 10px; border-radius: 14px; background: var(--accent-color); color: #ffffff; min-width: 50px; text-align: center; flex: 0 0 auto; }
+
+    .schedule-edit-box { display: flex; align-items: center; width: 100%; gap: 6px; min-width: 0; }
+    .sch-day-select { flex: 0 0 auto; }
+    .sch-content-edit { flex: 1 1 0 !important; min-width: 0 !important; word-break: break-all !important; overflow-wrap: break-word !important; white-space: pre-wrap !important; outline: none; }
+    .sch-time-zone-edit { flex: 0 0 auto; display: flex; align-items: center; gap: 3px !important; }
+    .sch-ampm { padding: 4px 3px !important; font-size: 0.75rem !important; width: 52px !important; border-radius: 8px !important; flex-shrink: 0 !important; }
+    .sch-time-val { width: 58px !important; padding: 4px 3px !important; font-size: 0.78rem !important; border-radius: 8px !important; flex-shrink: 0 !important; }
+
+    .mc-server-flex-container { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: #ffe4e8; border: 1.5px solid var(--card-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(255, 133, 162, 0.08); max-width: 100%; }
+    .mc-tag-text { font-weight: 800; color: var(--accent-color); font-size: 0.88rem; word-break: break-all; }
+
+    .video-edit-box { display: none !important; }
+    body.admin-mode .video-edit-box { display: flex !important; flex-direction: column; gap: 8px; margin-top: 14px; width: 100%; }
+
+    .calendar-container { width: 100%; overflow-x: hidden; }
+    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
+    .calendar-header h2 { font-size: 1.5rem; color: var(--accent-color); font-weight: 900; letter-spacing: -0.5px; }
+    .cal-nav-btn { background: #ffe4e8; border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
+    .cal-nav-btn:hover { background: var(--card-border); }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; }
+    .cal-day-name { font-size: 0.95rem; font-weight: 800; color: var(--accent-color); padding-bottom: 6px; text-align: center; }
+    .cal-cell { background: #fff8f9; border: 2px solid #ffe0e6; border-radius: 16px; height: 150px; padding: 8px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; }
+    .cal-cell::-webkit-scrollbar { width: 3px; }
+    .cal-cell::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+    .cal-cell-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2px; }
+    .cal-num { font-weight: 900; font-size: 0.95rem; color: var(--text-color); }
+    .cal-add-evt-btn { background: var(--card-border); border: none; color: var(--accent-color); width: 22px; height: 22px; border-radius: 50%; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
+
+    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: #ffffff; color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid #ffd1dc; width: 100%; position: relative; box-shadow: 0 2px 4px rgba(255, 133, 162, 0.08); cursor: pointer; transition: transform 0.15s; }
+    .cal-event-item:hover { transform: scale(1.01); background: #fff0f3; }
+    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; }
+    .cal-event-time { font-size: 0.68rem; font-weight: 800; color: var(--accent-color); outline: none; background: #ffe4e8; padding: 1px 4px; border-radius: 4px; white-space: nowrap !important; word-break: normal !important; display: inline-block; max-width: 100%; overflow-x: auto; }
+    .cal-event-time:empty:not([contenteditable="true"]) { display: none; }
+    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; }
+    .cal-event-del { border: none; background: transparent; color: #ffb6c1; font-size: 0.95rem; cursor: pointer; padding: 2px 4px; touch-action: manipulation; user-select: none; }
+
+    @media (max-width: 768px) {
+      body { padding: 16px 6px 120px; }
+      .card { padding: 14px 12px; border-radius: 18px; }
+      .sheet-tabs { padding: 4px; border-radius: 18px; gap: 4px; }
+      .tab-btn { min-width: 62px; font-size: 0.74rem; padding: 8px 0; border-radius: 12px; }
+      .calendar-header h2 { font-size: 1.2rem; }
+      .cal-nav-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 12px; }
+      .calendar-grid { gap: 3px; }
+      .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
+      .cal-cell { min-height: 95px; height: auto; padding: 3px 2px; border-width: 1.5px; border-radius: 10px; }
+      .cal-num { font-size: 0.75rem; }
+      .cal-add-evt-btn { width: 20px; height: 22px; font-size: 0.8rem; }
+      .cal-event-item { padding: 4px 4px; border-radius: 6px; border-width: 1px; }
+      .cal-event-time { font-size: 0.62rem; padding: 1px 3px; border-radius: 3px; white-space: nowrap !important; word-break: normal !important; display: inline-block; max-width: 100%; overflow-x: auto; }
+      body:not(.admin-mode) .cal-event-text { font-size: 0.68rem; line-height: 1.2; min-height: 16px; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-break: normal !important; letter-spacing: -0.4px; }
+      body.admin-mode .cal-event-text { white-space: nowrap !important; overflow-x: auto !important; word-break: normal !important; }
+      .cal-event-del { font-size: 1.05rem; padding: 2px 6px; }
+      .url-input, .date-input, .time-text-input, .text-input, .select-input, .sch-ampm, .sch-time-val, #global-search-input { font-size: 16px !important; }
+      .mc-tag-item { padding: 4px 10px; border-radius: 16px; }
+      .mc-tag-text { font-size: 0.8rem; }
+      .admin-bar { max-width: 95vw; padding: 8px 12px; gap: 8px; bottom: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .admin-bar button { font-size: 0.78rem; }
+      .admin-status { font-size: 0.75rem; }
+    }
+
+    .game-card-item { background: #fff8f9; border: 1.5px solid #ffe0e6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .game-title, .game-review-text, .tmi-content-text, .info-text { word-break: break-all; overflow-wrap: break-word; min-width: 0; }
+    .admin-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4a2830; padding: 10px 22px; border-radius: 30px; display: flex; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0, 0.3); z-index: 1000; align-items: center; }
+    .admin-bar button { background: transparent; border: none; color: #ffffff; font-weight: 700; font-size: 0.88rem; cursor: pointer; touch-action: manipulation; user-select: none; }
+    .admin-bar button:hover { color: #ff8da1; }
+    .admin-status { color: #ffccd5; font-size: 0.82rem; font-weight: 600; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 40, 48, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 2000; }
+    .modal-overlay.active { display: flex !important; }
+    .modal-card { background: #ffffff; padding: 24px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 3px solid var(--card-border); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .modal-card h3 { font-size: 1.1rem; color: var(--accent-color); margin-bottom: 8px; font-weight: 800; }
+    .modal-card p { font-size: 0.85rem; color: var(--text-color); margin-bottom: 16px; }
+    .modal-card input[type="password"] { width: 100%; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; text-align: center; }
+    .modal-card textarea { width: 100%; height: 160px; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 12px; font-size: 0.85rem; resize: none; margin-bottom: 8px; color: var(--text-color); outline: none; }
+
+    .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; font-size: 0.88rem; color: var(--text-color); }
+    .color-picker-row input[type="color"] { border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; background: transparent; }
+
+    .modal-btns { display: flex; gap: 8px; margin-top: 12px; }
+    .modal-btns button { flex: 1; padding: 9px 0; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
+    .btn-submit { background: var(--accent-color); color: white; }
+    .btn-cancel { background: #ffe4e8; color: var(--text-color); }
+    .error-msg { color: #ef4444; font-size: 0.78rem; margin-top: 8px; display: none; }
+
+    #game-bio {
+      color: var(--text-color) !important;
+      display: block !important;
+      visibility: visible !important;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      text-align: left;
+      white-space: normal;
+    }
+    #game-bio:empty::before {
+      content: "⭐ 별 기준 (그치만 내 기준이라 취향탈수도 있음)\a✔ 클리어 체크\a 6개 > 2번 플레이해도 재밌을 것 같은 게임\a 4~5개 > 남에게 추천하고 싶은 게임\a 3개 > 무난함 한번 해봐도 괜찮은 게임\a 2개 > 똥겜의 맛을 느끼고싶다면 추천\a 1개 > 돈주고 사기 아까운 게임";
+      white-space: pre-wrap;
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- 🔍 실시간 통합 검색바 -->
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <span style="font-size: 1rem;">🔍</span>
+        <input type="text" id="global-search-input" placeholder="프로필, 일정, 게임, 업적, TMI 검색..." oninput="handleGlobalSearch(this.value)">
+        <button class="search-clear-btn" id="search-clear-btn" onclick="clearGlobalSearch()">×</button>
+      </div>
+      <div class="search-results-dropdown" id="search-results-dropdown"></div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <div class="sheet-tabs">
+      <button class="tab-btn active" onclick="switchTab(event, 'main')">🎀 메인 프로필</button>
+      <button class="tab-btn" onclick="switchTab(event, 'monthly')">📅 월간 일정</button>
+      <button class="tab-btn" onclick="switchTab(event, 'achievements')">🏆 방송업적일대기</button>
+      <button class="tab-btn" onclick="switchTab(event, 'games')">🎮 플레이한 게임</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tmi')">💬 TMI &amp; 여담</button>
+    </div>
+
+    <!-- ==================== 시트 1: 메인 프로필 ==================== -->
+    <div class="tab-content active" id="tab-main">
+      <div class="main-columns-grid">
+        <div class="main-col-left">
+          <div class="card main-card-item" id="card-profile-header">
+            <div class="profile">
+              <div class="profile-img-wrapper">
+                <img src="https://via.placeholder.com/100" id="profile-img-element" class="profile-img" alt="프로필">
+                <label for="img-file-input" class="img-upload-btn admin-only">사진 변경 🎀</label>
+                <input type="file" id="img-file-input" accept="image/*,image/gif" style="display:none;" onchange="handleImageUpload(event)">
+              </div>
+              <h1 contenteditable="false" id="profile-name">메루 (MERU)</h1>
+              <div contenteditable="false" class="profile-bio" id="profile-bio">초섹시핫바디귀요미핑크공주 메루입니다</div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; margin-bottom:8px;">
+              <span style="font-size:0.9rem; font-weight:800; color:var(--accent-color);">📋 프로필 상세 정보</span>
+              <button class="add-btn admin-only" onclick="addProfileInfoItem()">+ 항목 추가</button>
+            </div>
+
+            <div class="profile-info-grid"></div>
+          </div>
+
+          <div class="card main-card-item" id="card-links">
+            <div class="section-header">
+              <div class="section-title">🔗 바로가기</div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
+                <button class="add-btn admin-only" onclick="addLink()">+ 추가</button>
+              </div>
+            </div>
+            <div class="list-wrapper" id="link-list"></div>
+          </div>
+        </div>
+
+        <div class="main-col-right">
+          <div class="card main-card-item" id="card-schedules">
+            <div class="section-header">
+              <div class="section-title">📅 주간 일정</div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
+                <button class="add-btn admin-only" onclick="addSchedule()">+ 추가</button>
+              </div>
+            </div>
+            <div class="list-wrapper" id="schedule-list"></div>
+          </div>
+
+          <div class="card main-card-item" id="card-anniversaries">
+            <div class="section-header">
+              <div class="section-title">🎉 기념일 (D-Day)</div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
+                <button class="add-btn admin-only" onclick="addAnniversary()">+ 추가</button>
+              </div>
+            </div>
+            <div class="list-wrapper" id="anniv-list"></div>
+          </div>
+
+          <div class="card main-card-item" id="card-video">
+            <div class="section-header">
+              <div class="section-title">🎥 대표 영상</div>
+              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
+            </div>
+            <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; border: 1.5px solid var(--card-border); background: #000000;">
+              <iframe id="main-video-iframe" src="https://vod.sooplive.com/player/204935355" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: none;"></iframe>
+              <video id="main-video-element" controls style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;"></video>
+            </div>
+            <div class="video-edit-box admin-only">
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-color); white-space: nowrap;">재생 방식:</span>
+                <select class="select-input" id="video-type-select" style="flex: 1;" onchange="updateVideoPlayer()"><option value="auto" selected="selected">자동 감지 (유튜브 / 스마트 링크)</option><option value="mp4">직접 비디오 파일 링크 (.mp4 / .webm)</option><option value="iframe">웹 임베드 주소 / iframe 링크</option></select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-color);">영상 링크 주소 (URL):</span>
+                <input type="text" class="url-input" id="video-url-input" value="https://vod.sooplive.com/player/204935355" placeholder="유튜브 링크, .mp4 직링크 등 입력" oninput="updateVideoPlayer()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 2: 대형 월간 달력 ==================== -->
+    <div class="tab-content" id="tab-monthly">
+      <div class="card calendar-container">
+        <div class="calendar-header">
+          <button class="cal-nav-btn" onclick="moveMonth(-1)">&lt;</button>
+          <h2 id="calendar-title"></h2>
+          <button class="cal-nav-btn" onclick="moveMonth(1)">&gt;</button>
+        </div>
+        <div class="calendar-grid">
+          <div class="cal-day-name" style="color:#ff4d73;">일</div>
+          <div class="cal-day-name">월</div>
+          <div class="cal-day-name">화</div>
+          <div class="cal-day-name">수</div>
+          <div class="cal-day-name">목</div>
+          <div class="cal-day-name">금</div>
+          <div class="cal-day-name" style="color:#ff6b8b;">토</div>
+        </div>
+        <div class="calendar-grid" id="calendar-body"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 3: 🏆 방송업적일대기 ==================== -->
+    <div class="tab-content" id="tab-achievements">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">🧱 입주했었던 마크 서버</div>
+          <button class="add-btn admin-only" onclick="addMcServerItem()">+ 서버 추가</button>
+        </div>
+        <div class="mc-server-flex-container" id="mc-server-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">🏆 방송 업적 일대기</div>
+          <div style="display:flex; gap:6px;">
+            <button class="add-btn admin-only" onclick="openBulkPasteModal('achievements')" style="background:#ffecb3; color:#d97706;">📋 여러 줄 붙여넣기</button>
+            <button class="add-btn admin-only" onclick="addAchievementItem()">+ 업적 추가</button>
+          </div>
+        </div>
+        <div class="list-wrapper" id="achievement-list"></div>
+        <div class="pagination-bar" id="pagination-achievements"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 4: 🎮 메루가 플레이한 게임들 ==================== -->
+    <div class="tab-content" id="tab-games">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:8px;">💡 게임 소감 &amp; 별점 소개</div>
+        <div contenteditable="false" class="profile-bio" id="game-bio">⭐ 별 기준 (그치만 내 기준이라 취향탈수도 있음)<br>✔ 클리어 체크<br>6개 &gt; 2번 플레이해도 재밌을 것 같은 게임<br>4~5개 &gt; 남에게 추천하고 싶은 게임<br>3개 &gt; 무난함 한번 해봐도 괜찮은 게임<br>2개 &gt; 똥겜의 맛을 느끼고싶다면 추천<br>1개 &gt; 돈주고 사기 아까운 게임</div>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">🎮 플레이한 게임 목록</div>
+          <div style="display:flex; gap:6px;">
+            <button class="add-btn admin-only" onclick="openBulkPasteModal('games')" style="background:#ffecb3; color:#d97706;">📋 여러 줄 붙여넣기</button>
+            <button class="add-btn admin-only" onclick="addGameItem()">+ 게임 추가</button>
+          </div>
+        </div>
+        <div class="list-wrapper" id="game-list"></div>
+        <div class="pagination-bar" id="pagination-games"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 5: 💬 TMI & 여담 ==================== -->
+    <div class="tab-content" id="tab-tmi">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">💬 메루의 TMI &amp; 여담</div>
+          <div style="display:flex; gap:6px;">
+            <button class="add-btn admin-only" onclick="openBulkPasteModal('tmi')" style="background:#ffecb3; color:#d97706;">📋 여러 줄 붙여넣기</button>
+            <button class="add-btn admin-only" onclick="addTmiItem()">+ TMI 추가</button>
+          </div>
+        </div>
+        <div class="list-wrapper" id="tmi-list"></div>
+        <div class="pagination-bar" id="pagination-tmi"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 하단 고정 제어바 -->
+  <div class="admin-bar">
+    <span class="admin-status" id="status-text">일반 모드</span>
+    <button id="auth-btn" onclick="handleAuthClick()">🔒 관리자 로그인</button>
+    <button class="admin-only" onclick="openThemeModal()">🎨 테마 색상</button>
+    <button class="admin-only" onclick="openChangePwModal()">🔑 비번 변경</button>
+    <button class="admin-only" onclick="manualSavePage()">💾 실시간 저장</button>
+  </div>
+
+  <!-- 📅 모달: 일정 상세보기 -->
+  <div class="modal-overlay" id="event-detail-modal">
+    <div class="modal-card">
+      <h3 id="evt-detail-date">📅 일정 상세보기</h3>
+      <p id="evt-detail-time" style="font-weight:800; color:var(--accent-color); margin-top:4px; margin-bottom:10px; font-size:0.9rem; display:none;"></p>
+      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:14px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; white-space:pre-wrap; word-break:break-all; margin-bottom:14px; max-height:280px; overflow-y:auto;"></div>
+      <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('event-detail-modal')">닫기</button></div>
+    </div>
+  </div>
+
+  <!-- 모달: 관리자 로그인 -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card">
+      <h3>🔒 관리자 인증</h3>
+      <p style="margin:10px 0;">비밀번호를 입력하세요.</p>
+      <input type="password" id="pw-input" placeholder="비밀번호 입력" onkeypress="if(event.key==='Enter') verifyPassword()">
+      <div class="modal-btns">
+        <button class="btn-submit" onclick="verifyPassword()">확인</button>
+        <button class="btn-cancel" onclick="closeModal('login-modal')">취소</button>
+      </div>
+      <p class="error-msg" id="error-msg">비밀번호가 일치하지 않습니다.</p>
+    </div>
+  </div>
+
+  <!-- 모달: 비밀번호 변경 -->
+  <div class="modal-overlay" id="change-pw-modal">
+    <div class="modal-card">
+      <h3>🔑 비밀번호 변경</h3>
+      <p style="margin:10px 0;">새 비밀번호를 입력하세요.</p>
+      <input type="password" id="new-pw-input" placeholder="새 비밀번호">
+      <input type="password" id="new-pw-confirm" placeholder="새 비밀번호 확인" onkeypress="if(event.key==='Enter') changePassword()">
+      <div class="modal-btns">
+        <button class="btn-submit" onclick="changePassword()">변경하기</button>
+        <button class="btn-cancel" onclick="closeModal('change-pw-modal')">취소</button>
+      </div>
+      <p class="error-msg" id="change-pw-error">비밀번호가 서로 일치하지 않습니다.</p>
+    </div>
+  </div>
+
+  <!-- 🎨 모달: 테마 색상 설정 -->
+  <div class="modal-overlay" id="theme-modal">
+    <div class="modal-card">
+      <h3>🎨 테마 색상 커스텀</h3>
+      <div class="color-picker-row"><span>배경 색상:</span><input type="color" id="picker-bg" value="#fff0f5" onchange="applyCustomTheme()"></div>
+      <div class="color-picker-row"><span>포인트 색상:</span><input type="color" id="picker-accent" value="#ff4d73" onchange="applyCustomTheme()"></div>
+      <div class="color-picker-row"><span>글자 색상:</span><input type="color" id="picker-text" value="#5c3a42" onchange="applyCustomTheme()"></div>
+      <div class="color-picker-row"><span>시트 탭 글자 색상:</span><input type="color" id="picker-tab-text" value="#ff758c" onchange="applyCustomTheme()"></div>
+      <div class="modal-btns">
+        <button class="btn-submit" onclick="saveThemeSettings()">저장</button>
+        <button class="btn-cancel" onclick="cancelThemeModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
+  <div class="modal-overlay" id="bulk-paste-modal">
+    <div class="modal-card">
+      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
+      <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
+      <div class="modal-btns">
+        <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
+        <button class="btn-cancel" onclick="closeModal('bulk-paste-modal')">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 🛡️ 전역 예외 방어 가드 */
+    window.onerror = function(msg, url, line) {
+      console.warn("방어된 스크립트 예외:", msg, "line:", line);
+      return true;
+    };
+
+    /* 💡 관리자 세션 상태 안전 관리자 (Fail-Safe Storage) */
+    function getAdminState() {
+      try {
+        return localStorage.getItem('is_admin_active') === 'true' || sessionStorage.getItem('is_admin_active') === 'true';
+      } catch(e) {
+        return document.body.classList.contains('admin-mode');
+      }
+    }
+
+    function setAdminState(bool) {
+      const str = bool ? 'true' : 'false';
+      try { localStorage.setItem('is_admin_active', str); } catch(e) {}
+      try { sessionStorage.setItem('is_admin_active', str); } catch(e) {}
+    }
+
+    /* 💡 YYYY-MM-DD 표준 변환 보조 함수 */
+    function formatYMD(dateStr) {
+      if (!dateStr) return '';
+      let clean = String(dateStr).trim().replace(/\s+/g, '').replace(/\./g, '-').replace(/\//g, '-');
+      if (/^\d{8}$/.test(clean)) {
+        clean = `${clean.substring(0, 4)}-${clean.substring(4, 6)}-${clean.substring(6, 8)}`;
+      }
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const y = parts[0];
+        const m = parts[1].padStart(2, '0');
+        const d = parts[2].replace(/[^\d].*/, '').padStart(2, '0');
+        if (/^\d{4}$/.test(y) && /^\d{2}$/.test(m) && /^\d{2}$/.test(d)) {
+          return `${y}-${m}-${d}`;
+        }
+      }
+      return clean;
+    }
+
+    /* 🛡️ 정밀 날짜 파서 */
+    function parseLocalDate(dateStr) {
+      if (!dateStr) return new Date();
+      const clean = formatYMD(dateStr);
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return new Date(y, m, d);
+      }
+      const dObj = new Date(clean);
+      return isNaN(dObj.getTime()) ? new Date() : dObj;
+    }
+
+    function calculateDDay(dateStr) {
+      if (!dateStr) return 'D-Day';
+      try {
+        const target = parseLocalDate(dateStr);
+        if (!target || isNaN(target.getTime())) return 'D-Day';
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        target.setHours(0, 0, 0, 0);
+        const diffTime = target.getTime() - today.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) return 'D-Day';
+        else if (diffDays > 0) return `D-${diffDays}`;
+        else return `D+${Math.abs(diffDays)}`;
+      } catch(e) {
+        return 'D-Day';
+      }
+    }
+
+    function applyLinkData() {
+      document.querySelectorAll('.link-item').forEach(item => {
+        const editName = item.querySelector('.link-name-edit');
+        const urlInput = item.querySelector('.url-input');
+        const anchor = item.querySelector('.link-anchor');
+        const nameSpan = item.querySelector('.link-name');
+        if (editName && nameSpan) nameSpan.textContent = editName.textContent.trim();
+        if (urlInput && anchor) anchor.setAttribute('data-href', urlInput.value.trim());
+      });
+    }
+
+    function formatAnnivDate(dateStr) {
+      if (!dateStr) return '01.01';
+      const clean = formatYMD(dateStr);
+      const parts = clean.split('-');
+      return parts.length === 3 ? `${parts[1].padStart(2, '0')}.${parts[2].padStart(2, '0')}` : dateStr;
+    }
+
+    function escapeHtml(str) { 
+      if (!str) return ''; 
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;"); 
+    }
+
+    function escapeAttr(str) { 
+      if (!str) return ''; 
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;'); 
+    }
+
+    function getCleanPlainText(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/gi, '')
+        .replace(/&gt;/gi, '')
+        .replace(/&lt;/gi, '')
+        .replace(/&amp;/gi, '')
+        .replace(/[\u200B-\u200D\uFEFF\u00A0\u3000\s]/g, '')
+        .trim();
+    }
+
+    let cloudAdminPw = "1234";
+    function getAdminPassword() { 
+      try {
+        return localStorage.getItem('admin_pw') || cloudAdminPw || "1234";
+      } catch(e) {
+        return cloudAdminPw || "1234";
+      }
+    }
+
+    document.addEventListener('paste', function(e) {
+      const target = e.target;
+      if (target && (target.isContentEditable || target.getAttribute('contenteditable') === 'true')) {
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain').trim();
+        const sel = window.getSelection();
+
+        if (pastedText.match(/^https?:\/\//i) && sel.rangeCount > 0 && !sel.isCollapsed) {
+          e.preventDefault();
+          const range = sel.getRangeAt(0);
+          const selectedText = range.toString();
+          const a = document.createElement('a');
+          a.href = pastedText;
+          a.target = '_blank';
+          a.textContent = selectedText;
+          range.deleteContents();
+          range.insertNode(a);
+          triggerAutoSave();
+          return;
+        }
+
+        e.preventDefault();
+        if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+          document.execCommand('insertText', false, pastedText);
+        } else {
+          if (!sel.rangeCount) return;
+          sel.getRangeAt(0).deleteContents();
+          sel.getRangeAt(0).insertNode(document.createTextNode(pastedText));
+        }
+        triggerAutoSave();
+      }
+    });
+
+    document.addEventListener('dragover', function(e) {
+      if (e.target.closest('[contenteditable="true"]')) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('drop', function(e) {
+      const target = e.target.closest('[contenteditable="true"]');
+      if (!target || !document.body.classList.contains('admin-mode')) return;
+
+      const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+      if (url && url.trim().match(/^https?:\/\//i)) {
+        e.preventDefault();
+        const cleanUrl = url.trim();
+        const sel = window.getSelection();
+
+        if (sel.rangeCount > 0 && !sel.isCollapsed) {
+          const range = sel.getRangeAt(0);
+          const selectedText = range.toString();
+          const a = document.createElement('a');
+          a.href = cleanUrl;
+          a.target = '_blank';
+          a.textContent = selectedText;
+          range.deleteContents();
+          range.insertNode(a);
+        } else {
+          let range;
+          if (document.caretRangeFromPoint) {
+            range = document.caretRangeFromPoint(e.clientX, e.clientY);
+          } else if (e.rangeParent) {
+            range = document.createRange();
+            range.setStart(e.rangeParent, e.rangeOffset);
+          }
+          if (range) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+            const a = document.createElement('a');
+            a.href = cleanUrl;
+            a.target = '_blank';
+            a.textContent = cleanUrl;
+            range.insertNode(a);
+          }
+        }
+        triggerAutoSave();
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) {
+        closeModal(e.target.id);
+      }
+      const searchContainer = document.querySelector('.search-container');
+      if (searchContainer && !searchContainer.contains(e.target)) {
+        const dropdown = document.getElementById('search-results-dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+        const dropdown = document.getElementById('search-results-dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+      }
+    });
+
+    function updateBodyScrollLock() {
+      const activeModal = document.querySelector('.modal-overlay.active');
+      if (activeModal) {
+        document.body.classList.add('modal-open');
+      } else {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    function closeModal(id) { 
+      const modal = document.getElementById(id); 
+      if (modal) modal.classList.remove('active'); 
+      updateBodyScrollLock();
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('active');
+      updateBodyScrollLock();
+    }
+
+    const ImageStore = {
+      dbName: 'ProfileImgDB_v3', storeName: 'images',
+      openDB: function() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(this.dbName, 1);
+          req.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('images')) e.target.result.createObjectStore('images'); };
+          req.onsuccess = e => resolve(e.target.result);
+          req.onerror = e => reject(e);
+        });
+      },
+      saveImage: async function(key, base64) {
+        try {
+          const db = await this.openDB();
+          const tx = db.transaction(this.storeName, 'readwrite');
+          tx.objectStore(this.storeName).put(base64, key);
+        } catch(e) {}
+      },
+      getImage: async function(key) {
+        try {
+          const db = await this.openDB();
+          return new Promise(resolve => {
+            const tx = db.transaction(this.storeName, 'readonly');
+            const req = tx.objectStore(this.storeName).get(key);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+          });
+        } catch(e) { return null; }
+      }
+    };
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_jevuy265KCywpj5rBjSxFW9pj_fcz_k",
+      authDomain: "meru-8658f.firebaseapp.com",
+      databaseURL: "https://meru-8658f-default-rtdb.firebaseio.com",
+      projectId: "meru-8658f",
+      storageBucket: "meru-8658f.firebasestorage.app",
+      messagingSenderId: "639609664876",
+      appId: "1:639609664876:web:81abc7ee97cee93322af49"
+    };
+
+    let isFirebaseActive = false, db = null;
+    try { firebase.initializeApp(firebaseConfig); db = firebase.database(); isFirebaseActive = true; } catch(e) {}
+
+    let pageState = { achievements: 1, games: 1, tmi: 1 };
+    let pageLimit = { achievements: 30, games: 30, tmi: 30 };
+
+    /* 💡 현재 연/월 자동 감지 */
+    const _initDate = new Date();
+    let currentYear = _initDate.getFullYear();
+    let currentMonth = _initDate.getMonth();
+
+    let calendarEvents = {"2026-8-21":[{"time":"20:00","text":"메루2.0 공개"}],"2026-8-22":[{"time":"","text":"휴방"}],"2026-8-23":[{"time":"22:40","text":"리애니멀DLC w.라무"}],"2026-8-24":[{"time":"","text":"정기휴방"},{"time":"","text":"픽셀동회의"}],"2026-8-27":[{"time":"19:00","text":"태풍에서 살아남기w.지력"}],"2026-8-30":[{"time":"21:30","text":"공겜동"}]};
+    let isFirebaseSaving = false, autoSaveTimer = null, currentBulkPasteTarget = 'achievements';
+    let tempOriginalTheme = { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
+
+    const DEFAULT_GAME_BIO = "⭐ 별 기준 (그치만 내 기준이라 취향탈수도 있음)<br>✔ 클리어 체크<br>6개 &gt; 2번 플레이해도 재밌을 것 같은 게임<br>4~5개 &gt; 남에게 추천하고 싶은 게임<br>3개 &gt; 무난함 한번 해봐도 괜찮은 게임<br>2개 &gt; 똥겜의 맛을 느끼고싶다면 추천<br>1개 &gt; 돈주고 사기 아까운 게임";
+
+    let storeData = {
+      profile: { name: "메루 (MERU)", bio: "초섹시핫바디귀요미핑크공주 메루입니다", img: "" },
+      gameBio: DEFAULT_GAME_BIO,
+      theme: { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' },
+      videoUrl: "https://vod.sooplive.com/player/204935355",
+      videoType: "auto",
+      infoGrid: [
+        ["이름", "메루", false], ["나이", "비공개", false], ["생일", "06월 17일", false], ["키 / 몸무게", "201cm / 201KG", false],
+        ["MBTI", "INSFP", false], ["팬네임", "메럿", false], ["첫방송", "2024.02.10", false], ["방송일차", "927일차 🎉", false],
+        ["출생", "경상도 토박이", true], ["주컨텐츠", "종합 게임, 소통 방송, 마인크래프트", true], ["좋아하는 게임", "마인크래프트, 힐링 게임, 스팀 게임", true]
+      ],
+      links: [
+        ["방송국 (SOOP)", "https://sooplive.co.kr"], ["팬카페", "https://cafe.naver.com/cutemeru"],
+        ["메루유튜브", "https://www.youtube.com/@_merurun"], ["메루띠띠", "https://www.youtube.com/@%EB%A9%94%EB%A3%A8%ED%8C%AC%EC%B1%84%EB%84%90"],
+        ["팬심", "https://fancim.me/celeb/profile.aspx?cu_id=meuuu3"]
+      ],
+      schedules: [
+        ["목요일", "메하싶데이", "PM", "?"], ["월요일", "정기휴방/픽셀동회의", "PM", "휴방"],
+        ["목요일", "태풍에서 살아남기w.지력", "PM", "19:00"], ["일요일", "공겜동", "PM", "21:30"]
+      ],
+      anniversaries: [["2026-11-05", "1000일"]],
+      mcServers: ["랜드마꾸", "버니버스", "마카오톡", "레오펠", "숲길", "호구와트", "마령전(퍼가욤)", "오함마3(납득단)", "마친다", "돌발서", "맹든링", "하루살이", "충동서버", "린코레일2", "삼국지", "후국지", "오프라인"],
+      achievements: [
+        ["20240210", "첫 방송 시작 (므3므)"],["20240315", "므3므 > 메루 닉네임 변경 / 립모션 공개"],["20240405", "고정 컨텐츠 매주 금요일 그림 핀볼 이벤트 시작"],["20240410", "첫 VR 풀트"],["20240428", "시청자 70명 달성"],["20240429", "나작버 유튜브 올라간 날"],["20240530", "랜드마꾸 춘밭런 1위"],["20240604", "팬 캐릭터 [메럿] 공개 · 메루 + 페럿"],["20240620", "SOOP 테일즈런너 대회 1위"],["20240621", "더파이널스 대회 이벤트전 1위"],["20240622", "물초코고 대 운동회 3위"],["20240704", "PUBG 플레이그라운드 제 1/2회 1위"],["20240705", "뉴비존 201기 선정"],["20240707", "러브라이브 노래 대회 코스프레 1위"],["20240712", "랜드마꾸 미니게임 파라다이스 1위"],["20240713", "VALORANT 철들의 전쟁 대회 1위"],["20240715", "SOOP 숲챌린지 최종 공동 2위"],["20240718", "뉴메루 공개"],["20240720", "PUBG SR 플레이 그라운드 2위"],["20240727", "봉준 고멤 오디션 참가"],["20240727", "실시간 검색어 4위"],["20240801", "랜드마꾸 마르텔 PVP 2위"],["20240902", "마카오톡 [츄릅] 길드 입성"],["20240921", "럭키마리시티 점프맵 1위"],["20241004", "[너메보] 고정 컨텐츠 시작"],["20241015", "폴가이즈 버종대 참가"],["20241016", "버니버스 방탈출 1위"],["20241108", "VOD BJ 달성"],["20241209", "VOD 브론즈 달성"],["20241224", "세이버즈 뽑기"],["20250110", "메이플스토리 6차 전직"],["20250112", "베스트 스트리머 첫 도전"],["20250131", "베스트 스트리머 달성 ★"],["20250210", "1주년 방송에서 첫 10,000개"],["20250210", "1주년 방송에서 첫 100두산"],["20250215", "겟투워크 CEO 첫트 클리어 7:44:56 / 히든 엔딩 8:27:25"],["20250222", "로볼록스 등산대회 3위"],["20250302", "Make Good Choices 1분 23초 클리어"],["20250331", "뉴뉴메루 공개 · 첫 멜리고 풀트"],["20250402", "파티애니멀즈 버종대 참가"],["20250405", "꼬맨틀 8트 컷"],["20250403", "팬카페 개설 - 깅메루 pump it up"],["20250415", "메루 팬카페 씨앗 3단계 달성"],["20250420", "[컵치킨배] 마크 대회 폴가이즈 2관왕"],["20250420", "[컵치킨배] 마크 대회 최종 1위 (10팀)"],["20250430", "메루 팬카페 씨앗 5단계 달성"],["20250515", "메루 팬카페 새싹 2단계 달성"],["20250524", "크레비쥬 모션캡쳐 콘서트 [숲퍼소닉] 1회 게스트 숲퍼소닉"],["20250527", "메이플 차원의숲 1스테이지 1:17:00 클리어"],["20250531", "메루 팬카페 새싹 4단계 달성"],["20250615", "메루 팬카페 잎새 1단계 달성 🌱"],["20250616", "물초코 체육대회 단체전 1등 / 팀전 1등"],["20250617", "SOOP 실시간 검색어 2위"],["20250617", "방송에서 맞이하는 2번째 생일"],["20250706", "[레오펠] 중력의탑 4번째로 클리어"],["20250814", "[마령전] 퍼가욤 3위 w. 퍼드 파이브 희희덕 나린인데 이낭 서라 숙봉 호미밍 민초희"],["20250814", "[마령전] 개인전 1위"],["20250814", "[마령전] 전체 킬 등수 6위"],["20250830", "뉴냥이배 폴가이즈3 대회 팀전 1등 (팀 114점 / 개인점수 57점)"],["20250822", "[오함마] 1차 합격"],["20250824", "[오함마] 물초코네 문파 [납득단] 합격 w. 물초코 유시에 라무"],["20250909", "메루 팬카페 50명 달성 !!"],["20250911", "[지력사무소] 2기 합격 🎉"],["20250912", "즐찾 1700명 달성"],["20250914", "즐찾 1800명 달성"],["20250915", "즐찾 1900 달성"],["20250916", "[황새오래걷기게임] 최고기록 187m"],["20250917", "[니즈배] 페스트펭귄 1위 (2회)"],["20251004", "[마친다] PVP 토너먼트 1위"],["20251004", "[마친다] 점프맵 타임어택 1:21초 타임어택 영상"],["20251016", "[지력] 더헌터 CK 1위"],["20251018", "[지력] 러시안 피싱 CK 우승"],["20251026", "[육창서버] 러스트 [지창팀] 최종 3위 w. 지력사무소"],["20251026", "[육창서버] 러스트 K/DA 순위 최종 1위 195킬 29데스"],["20251026", "[지육대] 지력사무소 최종 1위"],["20251111", "[돌발서버] PVP 투기장 1위"],["20251113", "[돌발서버] 다이아 CK 우승"],["20251118", "[돌발서버] 지(만)편한세상 완공"],["20251118", "[돌발서버] 세구라이더 예선전 1위"],["20251118", "[돌발서버] 세구라이더 결승전 1위"],["20251122", "[화석게임대전] 크아 이벤트전 1위"],["20251123", "[마크화살전쟁: 메가진화] 1위"],["20251201", "[맹든링] in100"],["20251203", "[맹든링: 파국] 1일차 w. 파이브 트할 학살 견자희 히츠메 차밍챠 온자두 꽃님 따스히 슨미 퍼드"],["20251207", "[맹든링: 파국] 길드 PVP 대회 2위"],["20251208", "[맹든링: 파국] 서리호수 퍼클"],["20251208", "[맹든링: 파국] 축축한동굴 퍼클"],["20251210", "[맹든링: 파국] 히든 (디코로 목격)"],["20251219", "[맹든링: 파국] wasd 최단기록 달성"],["20251223", "[맹든링: 파국] 3계층주 써드 선클"],["20251224", "[맹든링] 세기말 PVP 우승 팀"],["20251224", "[맹든링: 파국] 부유성 솔클"],["20251224", "[맹든링: 파국] 최다 퍼클 완주 6퍼클 2세컨 3써드"],["20251223", "[팬카페] 잎새 5단계 달성 🌱"],["20251229", "[팬카페] 100명 달성"],["20260111", "[더헌터] 알비노 희귀 퓨마 서버 최초 사냥 인줄 알았는데 그레이였음"],["20260120", "[팬카페] 가지 2단계 달성"],["20260122", "[종겜크루대전] 황새오래걷기 100m 승리 다시보기"],["20260122", "[종겜크루대전] 파워알까기 1:1 승리"],["20260122", "[종겜크루대전] 피코파크 팀전 승리"],["20260122", "[종겜크루대전] 폴가이즈 3관왕"],["20260122", "[지력사무소 VS 강씨세가] 종겜크루대전 최종 우승 🏆"],["20260207", "[언더테일] 샌즈전 15트클"],["20260210", "[2주년] 방송 🎉"],["20260223", "즐겨찾기 3000 달성"],["20260228", "[똥겜CK] SUPER SORRY 1위"],["20260301", "[첫 게임 대회] Ball&Roll 스피드런 대회 다시보기"],["20260301", "[패들패들패들] 1:17분 컷 w.목츄리"],["20260302", "[엘든링] 트리 가드 2시간 30분 컷"],["20260303", "[팬카페] 스타 뱃지 달림 !"],["20260307", "[패들패들패들] 50분 42초 1위 w.목츄리"],["20260307", "[테일즈런너] 숲 봄맞이 마라톤 2위"],["20260311", "[쌀레나] 2.5회차 최종 1위 w. 정다니 김쿼카 마늘빵 쨈도은"],["20260313", "[쌀레나] 크루대전 지력사무소 최종 1위 w. 지피티 라무 김쿼카 한아련"],["20260406", "[충동서버] 지력사무소 최종 3위"],["20260414", "[지력사무소] 키캡 숲토어 판매"],["20260414", "[지력사무소] 키캡 판매율 best 1~4위 달성"],["20260426", "황새걷기게임 199m 달성"],["20260427", "[지력사무소 VS 홍신소] 종겜크루대전 승리 🏆"],["20260428", "[쌀레나] 5회차 최종 1위 w. 트할, 희꾸미, 차투리, 새잎"],["20260502", "[디아블로2] 악몽 하드코어 1호기 클리어"],["20260502", "[지의시련] 클리어 ★"],["20260508", "[메의시련] 사과게임 + 황새 동시에 플레이하기 42점 + 48m"],["20260521", "[지력사무소] 2기 검색 배너 제작 배너 보기"],["20260521", "[지피티] 지피티 팬카페 디자인 스탭"],["20260524", "[엉망칠창] RUST 서버 전체 킬 3위, K/DA 5위 w. 지력사무소"],["20260524", "[미밍서버] RUST 최종 공동 1위 w. 린코 물초코 멍지수 나몽 이상훈 빈쫑"],["20260524", "[미밍서버] RUST 전체 킬 순위 1위 120킬 71데스"],["20260524", "[감니버스] 종겜올림픽 황새오래걷기 236m 금메달 🥇 다시보기"],["20260524", "[감니버스] 종겜올림픽 폴가이즈 금메달 🥇"],["20260524", "[감니버스] 종겜올림픽 최종 1위 3금 2은 🏆 w. 지력사무소"],["20260612", "[아크레이더스] 1주차 최종 1위 w. 지력사무소"],["20260617", "[메루] 오리지널 아바타 공개"],["20260619", "[아크레이더스] 2주차 최종 1위 w. 지력사무소"],["20260626", "[아크레이더스] 3주차 최종 1위 w. 지력사무소"],["20260629", "[린창서버] 최종 공동 1등 w. 지력사무소"],["20260717", "[지력사무소] 오락관 우승 w. 지피티 싱유 린코 이투"],["20260709", "[폴가이즈] 국가대항전 우승 w. 지력"],["20260806", "[삼국지] 적토마 모험히든 발견"],["20260809", "[후국지] 적토마 +10강 모험히든 발견"]
+      ],
+      games: [
+        ["Welcome to kowloon", "⭐⭐⭐⭐", "2024.03.03", "분위기가 미친 게임 약간 공포게임의 .. 정석 ?"],
+        ["Lethal Company", "⭐⭐⭐", "2024.03.12", "이 게임은 괴물이 어떻게 나오냐에 따라서 재미도가 달라짐"],
+        ["Within Skerry ★★★", "⭐⭐⭐", "2024.03.24", "진짜 내가 외국에 가있는 기분이 들었다 약간 ,, 외국 공포영화에 실제로 들어온 느낌"],
+        ["Shinkansen 0", "⭐⭐⭐⭐", "2024.04.02", "나름 스토리가 있는 이상현상 게임 8번 출구와는 다른 느낌이라 재밌었음."],
+        ["Dead By Daylight", "⭐⭐⭐", "2024.04.07", "잘 만든 게임중에 하나라고 생각함 쫓기는게 너무 무서움 .... 근데 발전기 수리 원툴이라 살짝 아쉬움 고인물이 판치는 게임..?"],
+        ["The Classrooms", "⭐⭐⭐⭐⭐", "2024.07.18", "백룸이랑 평타치는 퀄리티 수준의 게임 심장이 쫄깃한 맛이 있다"],
+        ["8번출구 ★★★★", "⭐⭐⭐⭐", "2024.07.28", "운이 좋아서 개빨리깻던 게임 이상현상 근본 게임 답게 무난히 재밌었다"],
+        ["Little Nightmares 1", "⭐⭐⭐⭐⭐⭐", "2024.08.27", "어드벤처공포게임 입문으로 최고인 게임 !! 메루의 강추게임"],
+        ["Little Nightmares 2", "⭐⭐⭐⭐⭐⭐", "2024.08.31", "너무 갓작이라 할 말이 없음"],
+        ["아오오니1 (원작)", "⭐⭐⭐⭐⭐⭐", "2024.09.11", "처음했던 첫 쭈꾸르 공포게임. 퍼즐도 무난히 쉬웠고 억까가 난무하지 않아서 재밌었음. 역시 쭈꾸르 근본 게임"],
+        ["Ib", "⭐⭐⭐⭐⭐", "2024.09.19", "암울한 분위기의 쭈꾸르 공포게임 기괴한 공포스러운 느낌을 좋아한다면 추천!"],
+        ["Fork road", "⭐⭐⭐⭐⭐⭐", "2024.10.01", "미친게임 ( 꼭 좋아하는 스트리머가 있다면 추천해보세요 )"],
+        ["IN SIDE", "⭐⭐⭐⭐", "2024.10.26", "리나메랑은 다른 분위기? 머리 쓰는 퍼즐 요소가 많았음 엔딩이 살짝 엥 스러웠지만 분위기 최고"],
+        ["Inside the Backrooms", "⭐⭐⭐⭐", "2024.11.05", "백룸의 종류가 엄청 다양해서 다양한 백룸을 즐기고 싶으면 강추 근데 후반 갈수록 길찾기 게임이 되는 듯한 느낌"],
+        ["Mayonaka 10 chome", "⭐⭐⭐⭐⭐", "2024.11.13", "이 게임을 한 뒤로부터 혼자 골목길을 걸어다닐 수가 없었어요 ...."],
+        ["Amanda the Adventurer 1", "⭐⭐⭐⭐", "2024.11.20", "처음 해보는 스타일의 공포게임이여서 되게 색달랐고 무조건 한 번은 실패해야 되는 방식이였어서 살짝 아쉬웠다"],
+        ["MiSide", "⭐⭐⭐⭐⭐⭐", "2025.01.04", "씹덕안성맞춤미연시공포게임강추 스토리도 재밌다! 공식 미연시버전 출시 존버중 D+965"],
+        ["Seoul Station", "⭐⭐⭐⭐", "2025.01.14", "단소할아버지;;;;;;;;;;;ㅠㅠ 8번출구를 재밌게했다면 추천! 한국 지하철 배경인 이상현상 게임"],
+        ["Poppy Playtime 1", "⭐⭐⭐⭐⭐", "2025.02.15", "짧고 굵게 잘만든 게임 .. 약간 다음 시리즈가 궁금해지는 게임이였음"],
+        ["Poppy Playtime 2", "⭐⭐⭐⭐", "2025.02.19", "쫓기는 맛이 맛있었음 (너무 무서워)"],
+        ["Poppy Playtime 3", "⭐⭐⭐⭐", "2025.02.28", "전과 다르게 퍼즐 요소가 많고 플레이타임이 길었음 가끔 나오는 공포요소가 너무 강력함"],
+        ["Poppy Playtime 4", "⭐⭐⭐⭐⭐", "2025.03.07", "4에서 어느정도 떡밥과 게임의 스토리가 풀려나가는 느낌이라 스토리 위주 시리즈 5가 기대됨 !"],
+        ["Death Stream", "⭐⭐⭐⭐⭐", "2025.03.20", "숨겨진 탈출 요소가 있었던 점이 재밌었음 약간 진짜 탈옥을 한다면 이런 기분일까? 싶했던 게임 굵고 짧게 즐기기 좋은 도파민 공겜"],
+        ["Clay-Scape", "⭐⭐⭐", "2025.04.01", "퍼즐요소 위주 살짝의 공포 분위기 할거없을때 해봐도 괜찮은 게임! (1챕터만 깸)"],
+        ["Amanda the Adventurer 2", "⭐⭐⭐⭐⭐", "2025.04.05", "분위기로 압도하는 게임 .. 기괴한 기분이 들었음 퍼즐을 풀기 위해서 무서운 비디오를 볼 수 밖에 없게 만든 미친게임"],
+        ["BACKROOMS: Escape Together", "⭐⭐⭐⭐⭐", "2025.04.06", "본인이 피지컬이 좋다면 추천 도망가는 부분에서 팀원들 놀리는 맛이 있음"],
+        ["False Mal", "⭐⭐⭐⭐⭐", "2025.04.11", "하다가 이게 공포게임이 맞나? 싶은 순간에 무서운 요소가 튀어나옴 .. 긴장을 멈출 수 없었던 이상현상 게임 !!"],
+        ["곰돌이 사슬 백룸", "⭐⭐⭐⭐", "2025.04.13", "클리어하고싶다면 멘탈이 좋은 팀원을 데려와야댐 조작감이 구려서 -1 순수재미게임"],
+        ["빨강 혹은 파랑", "⭐⭐⭐⭐⭐⭐", "2025.04.1+", "도파민 요소 선택 게임! 살짝의 공포요소가 있어서 덜 지루함"],
+        ["Dark Hours", "⭐⭐⭐", "2025.05.04", "와인 터는게 재밌었던 게임 도둑이 된 것 같은 기분이 들었어요"],
+        ["아오오니2 (블루베리 온천)", "⭐⭐⭐⭐⭐", "2025.05.10", "처음봤던 강아지 오니가 얼탱이가 없어서 아직도 기억에 남는 게임 역시 1처럼 퍼즐요소 및 새로운 요소가 많아서 좋았음."],
+        ["DEVOUR (25.05.13)", "별점 없음", "2025.05.13", "팀원들과 끈끈해지기 좋은 게임 ( 너무 무서워서 팀원들이 마구마구 앵김 )"],
+        ["BACKROOMS: We Escape Forever", "⭐⭐⭐⭐", "2025.06.08", "게임 자체는 잘 만들었는데 엔티티가 너무 멍청함"],
+        ["EMissary Zero", "⭐⭐⭐", "2025.06.08", "스토리도 나름 있고 도파민 요소도 적당해서 재밌었던 공포게임 근데 숙제가 너무 많아서 살짝 루즈 (막힐 경우에)"],
+        ["BACKROOM LOOP", "⭐⭐⭐⭐", "2025.06.20", "다양한 밈 요소가 나오는 신박한 공포게임! 강약중강약느낌이라 재밌었음. 근데 너무 이상현상이 안나와서 살짝 아쉬운 느낌"],
+        ["PANICORE", "⭐⭐⭐⭐", "2025.06.26", "무난한 공포게임 .. 괴물이 마이크 인식을 한다는 점이 신박했음"],
+        ["Escape the Backroom", "⭐⭐⭐⭐", "2025.0.03", "무난한 재미 ?? 기억력이슈 기억안남 백룸이 너무 많음"],
+        ["Dark water", "⭐⭐⭐", "2025.07.08", "ADHD 추천게임 수리공이 된 것 같은 기분이 들었어요! 누수 수리에 관심이 있다면 강추 ^^ 약간 킹받는 요소가 많아서 웃기고 재밌었음"],
+        ["Murky Divers", "⭐⭐⭐", "2025.07.20", "새로운 탐사 지역을 발견하는 재미가 있었다! 이래서 해적이 있나??싶은 생각이 들었음"],
+        ["후즈앳더도어", "⭐⭐⭐⭐⭐", "2025.09.11", "짧고 굵어서 재밌었음 ......................................................(1초기절함)"],
+        ["패들패들패들", "⭐⭐⭐⭐⭐", "2025.09.28", "지력 ck때 처음 해봤는데 언젠가는 완주 해보고 싶음"],
+        ["클로버핏 ★★★☆☆", "⭐⭐⭐", "-", "읍로버핏 최고점 25000원 죽어도 안함 소장님한테 마라탕값뜯김"],
+        ["살육의 천사", "⭐⭐⭐⭐", "2025.10.12", "옛날 근본 쭈꾸르 갬성이 좋았음 ( 그리고 추격전때 솔직히 좀 쫄림 )"],
+        ["팰월드 ", "⭐⭐⭐⭐⭐", "2025.09.25~", "게임 시스템 자체는 되게 좋았음 또 하고싶음 ( 사실 보스 잡는 것만 재밌었음 )"],
+        ["사슴 시뮬레이터", "⭐⭐⭐⭐", "-", "무친 게임 1"],
+        ["테라리아 ★★★★★ (전문가 난이도) ", "⭐⭐⭐⭐⭐", "-", "보스 잡는 게 재밌었음"],
+        ["아웃라스트3 ", "⭐⭐⭐⭐", "-", "퀄리티는 좋은데 게임의 매커니즘이 살짝 아쉬움 (루즈해지기 쉬움)"],
+        ["파라노이아 플레이스", "⭐⭐⭐⭐", "-", "게임 퀄은 좋았으나 퍼즐 요소가 살짝 복잡했다 (버그 이슈도 있음)"],
+        ["School 666", "⭐⭐⭐⭐⭐", "-", "뻔한 이상현상인데도 참신해서 재밌었음"],
+        ["백룸 컴퍼니", "⭐⭐⭐⭐", "-", "뻔한 이상현상인데도 참신해서 재밌었음"],
+        ["리애니멀 데모", "⭐⭐⭐⭐⭐", "-", "솔직히 리나메보다 인기 많을 거 같음 나오면 .."],
+        ["리틀나이트메어 3", "⭐⭐⭐⭐", "-", "1,2를 너무 기대하고 하면 안됨 . . . . . . 그치만 게임 그래픽은 TOP3급"],
+        ["러시안 피싱4 ★★★★★", "⭐⭐⭐⭐⭐", "-", "이 게임 때문에 현실 낚시 해보고싶어짐"],
+        ["러스트 ★★★★★", "⭐⭐⭐⭐⭐", "-", "또 하 고 싶 다"],
+        ["또 하 고 싶 다", "⭐⭐⭐⭐⭐⭐", "2026.08.24", "게임 플레이 소감과 후기를 작성하세요."],
+        ["스시 소울 유니버스 ", "⭐⭐⭐", "-", "무친 게임2 이 게임 하면서 스시만 309423개 먹음"],
+        ["Amanda the Adventurer 3", "⭐⭐⭐⭐⭐", "2026.01.11", "과하지않은 공포 분위기를 잘 조성했고 퍼즐 요소도 어렵지 않아서 재밌었음"],
+        ["No, I'm not a Human ", "⭐⭐⭐⭐⭐", "2025.12.29", "뒷통수가 아찔해진 게임"],
+        ["[Chilla's Art] Parasocial ", "⭐⭐⭐⭐⭐", "2026.01.09", "어제 이거하고 무서워서 오랜만에 문고리 걸고 잠"],
+        ["산나비 외전 : 귀신 씌인 날 (하드)", "⭐⭐⭐⭐⭐", "2025.11.29", "스킬 타격감이 좋아서 루즈해지지않았음"],
+        ["리듬 닥터 (Rhythm Doctor)", "⭐⭐⭐⭐", "2026.01.05", "이런 류의 리듬게임은 처음해봐서 좋은 경험이였음"],
+        ["더포레스트 2 엔딩 켠왕", "⭐⭐⭐", "2025.12.27", "스토리가 더 딥했으면 몰입도 되서 재밌었을듯"],
+        ["품멜 파티", "⭐⭐⭐⭐⭐", "2026.01.08", "후열 게임으로 맨날 맨날 하고싶음"],
+        ["UNDERWARD", "⭐", "2026.01.10", "이쁜 간호사 누나 보고싶다고 게임값 지원 받은 거 빼고 좋은게 없는 게임"],
+        ["Demonologist", "⭐⭐⭐", "-", "게임은 신박한데 너무 무서움 혼자 있어야 하는 기믹이 있어서 싫음 무서웠음"],
+        ["Whisper Mountain Outbreak", "⭐⭐⭐⭐⭐", "-", "로그라이크 첫 입문 게임 짱 재밌음 이거"],
+        ["Leaf it Alone ✔", "⭐⭐⭐⭐⭐", "2026.08.24", "청소 게임 입문하기 딱 좋음 잔잔 힐링 게임"],
+        ["우노링고 ", "⭐⭐⭐⭐⭐", "-", "뇌지컬 게임 입문하기 딱 좋은 게임 진짜 강추 재밌음"],
+        ["마이리틀퍼피 (4.5시간) ", "⭐⭐⭐⭐⭐", "-", "안우는 사람이 없을 것 같은 게임 그래픽이 좋음"],
+        ["Ball & Roll (153분)", "⭐⭐⭐⭐⭐", "-", "조작감 goat 최근에 한 온리업 중에 가장 재밌었음"],
+        ["Cairn", "⭐⭐⭐⭐⭐", "-", "지스터콜로 하게 된 등산 게임"],
+        ["ELDEN RING", "⭐⭐⭐⭐", "-", "후열로 하기 좋은 잔잔한 소울류 게임"],
+        ["Super sorry", "⭐⭐⭐", "-", "클리어 직전까지 깸 대회나가서 상금 독식 은근 재밌음"],
+        ["Hang Down", "⭐⭐", "-", "은근 피지컬 게임"],
+        ["Re:Animal", "⭐⭐⭐", "-", "열린 결말 느낌이라 스토리 해석본 필요"],
+        ["Undertale", "⭐⭐⭐⭐⭐", "-", "브금 고전 갓겜 언젠가 언더테일 OST 오케스트라 공연 보고싶음"],
+        ["UMIGARI", "⭐⭐⭐⭐", "-", "진짜 열받는데 재밌었음 ; 신박하다"],
+        ["동의게임", "⭐⭐", "-", "흠 ......... 게임 자체는 창의적"],
+        ["파피 플레이타임 5 ", "⭐⭐⭐", "-", "진짜 이번 한 번만 속아드립니다 ^^ .. 스토리 주세요"],
+        ["a difficult game about climbing", "별점 없음", "2024.03.13", "클리어는 못했지만 다시 한번 도전해보고 싶은 게임 !! 겟투워크류 좋아하면 강추"],
+        ["마법소녀 카와이 러블리 즈큥도큥 바큥 루루핑 ", "별점 없음", "2024.6.14", "흠... 신박함 점수 1점 드립니다.."],
+        ["산나비", "⭐⭐⭐⭐⭐⭐", "2024.07.20", "스토리 게임중 원탑이라고 생각함"],
+        ["Detroit Become Human", "⭐⭐⭐⭐⭐⭐", "2024.08.18", "산나비 맞밸 그래픽도 좋고 스토리도 딴딴함 감동이 있음 강추"],
+        ["To the Moon", "⭐⭐⭐", "2024.09.24", "하다가 중간에 졸뻔했지만 아무튼 감동적임 .. 쯔꾸르 근본 느낌?? 입문 게임 ! 브금이 좋아서 별 2점 더줌"],
+        ["GET TO WORK", "⭐⭐⭐⭐⭐", "2025.02.12", "조작감이 좋았고 어느정도 피지컬이 요구되서 재밌었다!"],
+        ["STEINS GATE ELITE", "⭐⭐⭐", "2025.03.15", "완전 애니 로컬느낌남 다음에 애니를 보고 호기심이 생기면 다시 해볼 의향 있음"],
+        ["peak", "⭐⭐⭐⭐⭐⭐", "2025.07.18", "최근 플레이 한 협동 게임중에 가장 잘 만든 게임"],
+        ["나무는 메루를 싫어해", "⭐⭐⭐⭐⭐", "2026.04.17", "나도 나무를 싫어하게 된 게임"],
+        ["Ready or Not", "⭐⭐⭐⭐", "2026.04.15", "특공대가 된 기분 몰입력 가지고 하면 충분히 재밌는 게임 근데 조금 어려워서 많은 인원이 필요하다 .. 다음에 한번 꼭 깨보고 싶다"],
+        ["Home : 집으로", "⭐⭐⭐⭐⭐", "2026.04.10", "힐링물인 것 같으면서도 뭔가 침울한 느낌 .. 소소힐링 겸 시간 보내기 좋은 게임이였다 ~!"],
+        ["Scam Line", "⭐⭐⭐", "2026.04.12", "마음놓고 편하게 거짓말 칠 수 있는 게임이여서 색다른 경험이였다. 근데 기빨림 이슈로 별3개"],
+        ["파스파투 2: 방황하는 예술가", "⭐⭐⭐⭐⭐", "2026.04.10", "사실 나는 캐릭터보다 풍경 그리는게 더 재밌나? 싶게 해준 게임 브러쉬 퀄보고 깜짝 놀람 !"],
+        ["김밥천국 시뮬레이터", "⭐⭐⭐⭐⭐", "2026.04.10", "나는 창업을 하면 절대 안될 것 같음 바로 위생 관련해서 끌려갈 것 같음 근데 김밥에 당근은 쫌"],
+        ["BIOHAZARD 7", "⭐⭐⭐⭐⭐", "2026.03.14", "스토리 재밌다고해서했는데 가장 무서운 게임을 추천 해줬던 거였음 ... 다음 시리즈가 기대 될 정도로 퀄도 좋고 나름 탄탄한 것 같음"],
+        ["LOST EGG the Hard Boiled", "⭐⭐⭐", "2026.04.10", "진짜 왠만한 똥겜 화 안나는데 이건 좀 화날뻔 세이브가 너무 불친절해요 ㅡㅅ ㅡ"],
+        ["오버워치", "⭐⭐⭐⭐", "-", "사설 서버 피아노 치기 장인 ( 숫자송 조금 칠줄 앎 )"],
+        ["디아블로 2 ( 하드코어 악몽 클리어 )", "⭐⭐⭐⭐⭐", "-", "지의 시련 클리어 ^___^"],
+        ["백척귀신", "⭐⭐", "-", "본인이 시간 부자면 ㄱㄱ"],
+        ["Ready or Not", "⭐⭐⭐⭐", "2026.08.24", "어려워서 -1 점 .. 취향 맞는 애들끼리 하면 완전 재밌는 게임 같음!"]
+      ],
+      tmi: [
+        ["💡 TMI", "1. 설날에 본가에 못가 심심해서 방송을 켰던걸 계기로 첫 시작 이날 첫 방송으로 조용히 게임을 하다 껏다고 한다"],
+        ["💡 TMI", "2. 방송 초창기때는 다시보기가 흑역사가 될거라 생각해 전부 삭제했다가 시청자가 지우지말란 뒤로 안지운다고 한다"],
+        ["💡 TMI", "3. 러브라이브(니지가사키)를 정말 좋아한다고 한다 성우까지 덕질 할 정도"],
+        ["💡 TMI", "4. 24년에 첫 일본여행을 도쿄로 다녀왔다고 한다 생각보다 가챠에 돈을 안썻다"],
+        ["💡 TMI", "5. 방송 키기 1시간전에 나작버에 영상이 올라왔다고해서 급하게 자기소개 PPT를 만들어왔다고 한다"],
+        ["💡 TMI", "6. 한때 연어장에 꽂혀서 연어장만 먹었는데 요즘은 질렸다고 한다 새우장이 더 좋아졌다고"],
+        ["💡 TMI", "7. 제주도 삼다도의 삼이 무엇이냐는 문제에서 삼다수라고 답했던 적이 있다 (버든벨)"],
+        ["💡 TMI", "8. 봉준 고멤 오디션에서 오타게녀로 출연했지만 탈락 티셔츠도 직접 만들었는데 못보여준게 아쉬웠다고"],
+        ["💡 TMI", "9. 숲 공식 마크 대회 숲챌린지 견제가 들어오자 새벽에 방송키고 달렸다고 한다"],
+        ["💡 TMI", "10. 방송 시작 후 재정비로 알바를 그만뒀지만 현재는 프리랜서 투잡이라고 한다"],
+        ["💡 TMI", "11. 잠시 카페에 들렸는데 뒤에 산이 보여서 등산까지 갔다온 슈퍼 P 라고 한다"],
+        ["💡 TMI", "12. 마인크래프트 스티브를 좋아하는 이상한 취향이 있다 이유는 릴스에 자주 뜨는 밈 영상 때문에 호감이 됐다고"],
+        ["💡 TMI", "13. 우쿠렐레가 있어 방송에서 종종 쳐준다고 한다"],
+        ["💡 TMI", "14. 성형 및 옷 뚜따 전부 본인이 직접 작업해 사용중"],
+        ["💡 TMI", "15. 매월 1일 별별랭킹에서 시청자 본인의 순위를 맞추는 구독권 이벤트를 하는데 시청자가 매번 잘 맞춰 항상 지갑을 털린다고 한다"],
+        ["💡 TMI", "18. 버종대 폴가이즈 대회날 키보드에 갈비탕을 엎어 급하게 다이소 키보드를 사왔다고 한다"],
+        ["💡 TMI", "19. 겨울엔 보일러를 안틀고 의자용 엉따와 전기장판으로 버틴다고 한다 그래서 항상 손이 시렵다고 한다"],
+        ["💡 TMI", "20. 귀여운 미소녀를 정말 좋아한다고 한다 그래서 일본갔을때 메이드 알바생한테 전단지를 받아왔다고 (굿즈)"],
+        ["💡 TMI", "21. 뉴비존 5수생 왜 안될까 했는데 신청 접수기간이 아닐때 계속 ( ... ) 신청을 했다고 한다"],
+        ["💡 TMI", "22. 버니버스에 초대권을 받아서 들어간 당일날 점프맵 이벤트에서 1등을 해 초대권을 얻었다고 한다"],
+        ["💡 TMI", "23. 방송 후기에 마크 일기도 종종 쓴다고 한다"],
+        ["💡 TMI", "24. 방송 초창기때는 직접 구독티콘과 시그니쳐 풍선을 만들어서 사용했다고 한다 현재는 메럿단 OGQ를 준비중이다"],
+        ["💡 TMI", "25. 방송 초창기때 방셀 문화가 신기해 시청자 모두에게 스방셀을 무료로 돌렸다고 한다.."],
+        ["💡 TMI", "26. SOOP에서 나히아를 처음 봤는데 그 뒤로 혼자 7기까지 달렸다고 한다 데쿠의 찌질한 모먼트를 좋아한다고 한다"],
+        ["💡 TMI", "27. 산나비 플레이中 송소령이 눈물을 흘리는 장면에서 같이 울었다"],
+        ["💡 TMI", "28. 디트로이트 비컴 휴먼 다른 엔딩을 보려고 같은 장면 도르마무만 2시간을 했다고 한다 고인물이 와서 평소 호감작도 중요하다고 말한 뒤로 포기했다고 한다"],
+        ["💡 TMI", "29. 리틀나이트 메어/인사이드 류 인디게임을 좋아해서 방송에서 모두 플레이하였고 리나메 3도 기대중이라고 한다"],
+        ["💡 TMI", "30. 마카오톡 1.5 프리패스권 핀볼로 서버에 들어갔다고 한다"],
+        ["💡 TMI", "31. 가장 재미있게 플레이했던 공포게임은 Fork Road/리나메 라고 한다, BACK ROOM 도 좋아한다고 한다"],
+        ["💡 TMI", "32. 11/11 첫 수제 빼빼로 이벤트를 했는데 새벽 5시에 마무리가 되고 택배를 보내고 자려고 부랴부랴 나갔는데 택배사가 점심시간이라 다시 집에 돌아왔었다고 한다"],
+        ["💡 TMI", "33. 메이플스토리 아란을 251까지 키웠었던 적이 있었다 이번 24년 12월 하이퍼버닝을 기대중이라고 한다"],
+        ["💡 TMI", "34. 원래는 오른쪽 눈이 노랑색 이였다고 한다"],
+        ["💡 TMI", "35. 메이플 3일차에 파풀격파성공 !! 캐논슈터는 낭만!!"],
+        ["💡 TMI", "36. 일본에만 판매중인 하겐다즈 푸딩맛을 매우 좋아한다 여행중 3번이나 사먹었다고 한다."],
+        ["💡 TMI", "37. 크리스마스 이브날 챔프 1도 모르는 메루가 골라주는 픽으로 시청자 vs 시청자 롤 대회를 했다,"],
+        ["💡 TMI", "38. 크리스마스 날 메럿단과 합동 배너를 제작 ! 세이버즈도 뿌리고 확업 이벤트두 했다."],
+        ["💡 TMI", "39. 서울역 공포게임 시그니엘 미션을 실패했다 ( 20초 차이로 )"],
+        ["💡 TMI", "40. 미사이드에서 잠자는 미타가 원픽이라고 한다"],
+        ["💡 TMI", "41. 동물농장 김밥만들기 최고기록 299점 (버튜버 최초)"],
+        ["💡 TMI", "41. 메이플 가엔슬 1트 클리어"],
+        ["💡 TMI", "42. 이지 루시드 1인 격파"],
+        ["💡 TMI", "43. 메이플에서 이터널 링 잠재 돋보기 딸깍 STR 3줄 30퍼"],
+        ["💡 TMI", "44. 세이버즈 지박령인 메루는 섭종소식에 슬퍼했다 .."],
+        ["💡 TMI", "45. 세이버즈 붕붕이 1000개 보유자 / 붕붕이 티셔츠 보유자 ( 팬이 보내줌 ! )"],
+        ["💡 TMI", "46. 팬이 운영하는 유튜브 '메루띠띠' 팬채널이 있다"],
+        ["💡 TMI", "47. '메루띠띠' 채널아트를 만들었다 !"],
+        ["💡 TMI", "48. 발렌타인기념 히든미션 시청자 이벤트를 진행 !"],
+        ["💡 TMI", "49. 러브 라이브 OST - 스노하레 【COVER】 공개 Snow halation"],
+        ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
+        ["💡 TMI", "51. 연어장을 좋아한다 !"],
+        ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞𝐝𝐚𝐲]"],
+        ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
+        ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
+        ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
+        ["💡 TMI", "57. 4.18일 플로팅 배너 리뉴얼 (팬심,유튜브,팬카페)"],
+        ["💡 TMI", "58. 3.23일 공겜동 (공포게임 동아리) 입성"],
+        ["💡 TMI", "59. get to work 플레이 당시 시청자가 만들어준 노래  메루 또 떨어진다  / 메루 또 날먹한다  / 메루야 CEO 한번 가보자\n메루 원픽 > [메루 또 떨어진다] 이유 가사가 의식의 흐름인게 딱 본인 같아서"],
+        ["💡 TMI", "60. 방송 인생중 본인이 가장 레전드라고 생각하는 장면 스테이크 칼"],
+        ["💡 TMI", "61. 마크하면서 가장 많이 먹었던 음식은 연어초밥이다 ( 왠지 모르게 잘 넘어가서 )"],
+        ["💡 TMI", "62. 사과게임 76점 달성 !!"],
+        ["💡 TMI", "63. 4/18일 시그니처 풍선을 새로 공개하였다 !"],
+        ["💡 TMI", "64. 5.9 mbti 검사에서 INFJ-T 가 나옴 !"],
+        ["💡 TMI", "65. 러브라이브 성우가 나보고 귀엽다고 해줌 (인생 업적)"],
+        ["💡 TMI", "66. 최애 성우가 반쪽하트 내밀어줌"],
+        ["💡 TMI", "67. 가장 맛있게 먹은 햄버거 브랜드는 쉑쉑버거 + 밀크쉐이크 + 감자튀김 조합"],
+        ["💡 TMI", "68. 맥도날드 맥플러리 + 롯데리아 토네이도 쿠키를 좋아한다"],
+        ["💡 TMI", "69. 메이드의 날 기념 3인 커버곡 공개  【뉴냥이 X 메루 X 뱌링】 愛♡スクリ～ム! (아이스크림) - AiScReam 🍦𝑪𝒐𝒗𝒆𝒓"],
+        ["💡 TMI", "70. OGQ 이모티콘 중에 웰시코기 시리즈 이모티콘을 가장 좋아한다."],
+        ["💡 TMI", "71. 6.8 머리 , 눈 색상 변경 ( 흰뚝 카르텔 입성 )"],
+        ["💡 TMI", "72. 6.12 일렉기타 연습 1일차! 목표 곡은 케이온 후와후와타임!! 젤 첨으로 연습했던 곡은 드라우닝이랑 HAPPY !"],
+        ["💡 TMI", "73. 6.13 물초코고 마크 체육대 야간편 참가 확정!"],
+        ["💡 TMI", "74. 최근 즐겨듣는 노래는 나츠시로 타카아키 - Universe"],
+        ["💡 TMI", "75. 생일날 풀트뱅을 하면서 숲퍼소닉에서 췄던 춤들을 다시 췄다!"],
+        ["💡 TMI", "75. 생일날 메버거,구독권,퀵뷰 걸고 TMI 퀴즈 이벤트 진행 !! 총 22문제(히든포함)"],
+        ["💡 TMI", "76. 제일 좋아하는 최애 영상 jazz for Cows"],
+        ["💡 TMI", "77. 하이퍼 버닝 MAX 2번째 육성 캐릭터는 엔젤릭 버스터 ( 6차까지 완료 )"],
+        ["💡 TMI", "78. 레오펠에서 경상도땡컨으로 활동하였다 !"],
+        ["💡 TMI", "79. 버튜버 50문답을 했었다"],
+        ["💡 TMI", "80. 폴가이즈 대회에서 1등만 4번했다."],
+        ["💡 TMI", "81. 최근에 시네티로 베테랑을 보았다"],
+        ["💡 TMI", "82. 마크하면서 가장 많이 먹었던 음식은 연어초밥이다 ( 왠지 모르게 잘 넘어가서 )"],
+        ["💡 TMI", "83. 최근에 열시미 영양제를 먹구이따 ^_^"],
+        ["💡 TMI", "84. 마크 서버 시작 전 병원가서 링거맞고 집 오는 길에 포도당 캔디를 사왔다"],
+        ["💡 TMI", "85. 현재 10월 10일에 나오는 리나메3를 기대중이다."],
+        ["💡 TMI", "86. 최근에 가장 깜짝 놀랐던 건 후앳더 플레이중이였다,,,,,,,,,,,,, 후앳더 비명 클립"],
+        ["💡 TMI", "87. 가장 좋아하는 아이스크림은 빵또아 / 캔디바이다"],
+        ["💡 TMI", "88. 사과게임 81점 고점뚫기 성공"],
+        ["💡 TMI", "89. 맥도날드 오레오 맥플러리 짱 맛있따"],
+        ["💡 TMI", "90. 메루정식 - 맥도날드 스낵랩 + 맥플러리"],
+        ["💡 TMI", "91. 최근에 자주 시켜 먹는 메뉴는 삼겹살 덮밥과 맥도날드와 돼지고기 김치찌개이다 ( 맥도날드가 최애 )"],
+        ["💡 TMI", "92. 10.14일 드디어 컴퓨터 사운드를 고침"],
+        ["💡 TMI", "93. 마친다 서버 점프맵 타임어택 1:21초 타임어택 영상"],
+        ["💡 TMI", "94. 최근에는 가끔 새벽에 와플을 시켜먹었다 ( 바나나 누텔라 와플 최애 근데 사실 쿠앤크 와플을 조금 더 좋아하지만 파는 곳이 없었음 )"],
+        ["💡 TMI", "95. 메이플 로얄 깡 했는데 개폭망함 그래도 원했던 마라벨 무기를 얻음 ( 낫 )"],
+        ["💡 TMI", "96. 최근 지력 할로윈 VRC 합방에서 입었던 옷의 컨셉은 사실 시계토끼였음"],
+        ["💡 TMI", "97. 할로윈데이 기념 공겜동 첫 VR 공포게임 합방을 진행했다 (히누 생일 축하도 해줌)"],
+        ["💡 TMI", "98. 지육대 양궁전에서 손을 겁나 떨었다 알고보니 고정그립을 안켜놨었단 사실"],
+        ["💡 TMI", "99. 지육대 개인 결과 ( 사격 5 0 7 0 0 / 9 7 0 9 0 ) ( 양궁 7 0 5 )"],
+        ["💡 TMI", "100. 지대백 리버스 1등"],
+        ["💡 TMI", "101. 러스트에서 스나만 잡았다"],
+        ["💡 TMI", "102. 리나메 1년 존버했는데 실망했다 (스토리적으로 게임 퀄은 만족)"],
+        ["💡 TMI", "103. 살육의천사 플레이중 솔직히 하다가 중간에 졸뻔했다 + 주인공 레이첼 코스프레 까지 한 날"],
+        ["💡 TMI", "104. 지금 뒤에 먹다 남은 장각구이 있는데 냄새가 너무 좋아서 또 시켜먹고싶어짐"],
+        ["💡 TMI", "105. 최근에는 사케동 자주 시켜먹음"],
+        ["💡 TMI", "106. 패들패들패들 엔딩 보고싶음 같이 할 사람이 없어서 보류중"],
+        ["💡 TMI", "107. 최근 기대작은 리애니멀"],
+        ["💡 TMI", "108. 집에 있는 담요를 덮으려고 했지만 어디 뒀는지 기억안나서 그냥 이불 덮고있음"],
+        ["💡 TMI", "109. 현재 메루는 배가 고프다 11.3 오전 12시 5분"],
+        ["💡 TMI", "110. 더헌터 ck에서 총 123점 획득 (총 53마리)"],
+        ["💡 TMI", "111. 최근에 시네티 아저씨 보면서 맥도날드 먹음"],
+        ["💡 TMI", "112. 이세돌 빼빼로 오우너 (선물받음) 근데 먹기 아까워서 굿즈로 소장 예정"],
+        ["💡 TMI", "113. VR 오래 쓰고 벗으면 뚝배기가 아프다고 한다 (한계 4시간)"],
+        ["💡 TMI", "114. 여름 ~ 가을 사이를 좋아한다"],
+        ["💡 TMI", "115. 🎄크리스마스 단체 커버곡 공개 【8人】ジングルベル가 architecture (징글벨이 멈추지 않아) - Aqours🎁𝑪𝒐𝒗𝒆𝒓"],
+        ["💡 TMI", "116. 습기님 25년 일출서버 합격 ! > <"],
+        ["💡 TMI", "117. 지소장님 국토때 도시락싸주고 직접 국토방셀 찍어옴 ㅋㅋ"],
+        ["💡 TMI", "118. [맹든링] 초기때는 전사 직업이였다 후에 마법사로 전직 .."],
+        ["💡 TMI", "119. [맹든링] 사과 쟁탈로 얻은 사과로 히든 찾았다"],
+        ["💡 TMI", "120. [맹든링] 보물찾기로 탈것 교환권을 얻음! 누렁이 3개나 뽑음"],
+        ["💡 TMI", "121. [맹든링] 파국은 12누렁이국이였다"],
+        ["💡 TMI", "122. [맹든링] 재밌었던 인던 순위 [부유성 = 카림 = 갱플 > 미궁 > 등등 . . .]"],
+        ["💡 TMI", "123. [맹든링] 가장 좋아하는 브금 : 얼어붙은 낙원, 갱플 브금"],
+        ["💡 TMI", "124. [맹든링] 가장 기억에 남는 장소 : 부유성 다리"],
+        ["💡 TMI", "125. [맹든링] 7시에 부유성 솔플 클리어로 서버를 마무리"],
+        ["💡 TMI", "126. [맹든링] 인던에 못들어갈뻔했지만 슈퍼세이브로 들어감 6:39:59초"],
+        ["💡 TMI", "127. 이번 메이플 버닝때는 레지스탕스를 키우고싶다"],
+        ["💡 TMI", "128. 크리스마스때 먹을려고 핫초코랑 우유를 주문 해뒀다"],
+        ["💡 TMI", "129. 맹든링때 가장 많이 시켜먹었던건 메밀면이다"],
+        ["💡 TMI", "130. 맹든링 기간에 배달을 27번 시켰다 이중에 디저트가 한 5개 있음"],
+        ["💡 TMI", "131. 맹든링 최애 BGM 그라스프핀 / 얼어붙은낙원"],
+        ["💡 TMI", "132. 최근에 겨울용 또띠아 담요를 구매함"],
+        ["💡 TMI", "133. 마크 방탈출 1분 남기고 탈출 w. 싱유 니밍 병살"],
+        ["💡 TMI", "134. 쌀레나 2회차 참가"],
+        ["💡 TMI", "135. 2주년 기념 커버곡 공개 쿨 - 애상  🤍"],
+        ["💡 TMI", "136. 대회에 나가서 가장 크게 탄 상금은 130만원이다 !"],
+        ["💡 TMI", "137. 최근에 Ball&roll 스피드런 대회를 주최해서 성공적으로 끝냈다"]
+      ]
+    };
+
+    function extractStoreDataFromDOM() {
+      const pName = document.getElementById('profile-name')?.textContent.trim() || '';
+      const pBio = document.getElementById('profile-bio')?.textContent.trim() || '';
+      const profileImgEl = document.getElementById('profile-img-element');
+      const pImgSrc = profileImgEl ? (profileImgEl.getAttribute('src') || profileImgEl.src || '') : '';
+      const isPlaceholder = pImgSrc.includes('via.placeholder.com');
+
+      storeData.profile = { 
+        name: pName, 
+        bio: pBio, 
+        img: (!isPlaceholder && pImgSrc) ? pImgSrc : (storeData.profile?.img || '') 
+      };
+
+      const gameBioEl = document.getElementById('game-bio');
+      if (gameBioEl) {
+        const rawHtml = gameBioEl.innerHTML.trim();
+        const cleanText = getCleanPlainText(rawHtml);
+        if (cleanText.length > 0) {
+          storeData.gameBio = rawHtml;
+        } else {
+          storeData.gameBio = DEFAULT_GAME_BIO;
+        }
+      } else {
+        storeData.gameBio = DEFAULT_GAME_BIO;
+      }
+
+      const leftColCards = document.querySelectorAll('.main-col-left > .main-card-item');
+      const rightColCards = document.querySelectorAll('.main-col-right > .main-card-item');
+      storeData.cardOrderLeft = Array.from(leftColCards).map(el => el.id).filter(Boolean);
+      storeData.cardOrderRight = Array.from(rightColCards).map(el => el.id).filter(Boolean);
+
+      const pBg = document.getElementById('picker-bg')?.value;
+      const pAccent = document.getElementById('picker-accent')?.value;
+      const pText = document.getElementById('picker-text')?.value;
+      const pTabText = document.getElementById('picker-tab-text')?.value;
+      if (pBg && pAccent && pText && pTabText) {
+        storeData.theme = { bg: pBg, accent: pAccent, text: pText, tabText: pTabText };
+      }
+
+      storeData.videoUrl = document.getElementById('video-url-input')?.value.trim() || '';
+      storeData.videoType = document.getElementById('video-type-select')?.value || 'auto';
+
+      const gridItems = document.querySelectorAll('.profile-info-grid .info-box-item');
+      storeData.infoGrid = [];
+      gridItems.forEach(item => {
+        const lbl = item.querySelector('.info-box-label')?.textContent.trim() || '';
+        const val = item.querySelector('.info-box-val')?.textContent.trim() 
+                 || item.querySelector('.stream-days-badge')?.textContent.trim() 
+                 || '';
+        const isFull = item.classList.contains('full-width');
+        if (lbl || val) storeData.infoGrid.push([lbl, val, isFull]);
+      });
+
+      const linkItems = document.querySelectorAll('#link-list .link-item');
+      storeData.links = [];
+      linkItems.forEach(item => {
+        const name = item.querySelector('.link-name-edit')?.textContent.trim() || item.querySelector('.link-name')?.textContent.trim() || '';
+        const urlInput = item.querySelector('.url-input');
+        const url = urlInput ? urlInput.value.trim() : (item.querySelector('.link-anchor')?.getAttribute('data-href') || '');
+        if (name || url) storeData.links.push([name, url]);
+      });
+
+      const schItems = document.querySelectorAll('#schedule-list .schedule-item');
+      storeData.schedules = [];
+      schItems.forEach(item => {
+        const day = item.querySelector('.sch-day-select')?.value || item.querySelector('.day-badge')?.textContent.trim() || '월요일';
+        const content = item.querySelector('.sch-content-edit')?.textContent.trim() || item.querySelector('.info-text')?.textContent.trim() || '';
+        const ampm = item.querySelector('.sch-ampm')?.value || 'PM';
+        const time = item.querySelector('.sch-time-val')?.value.trim() || '';
+        if (day || content) storeData.schedules.push([day, content, ampm, time]);
+      });
+
+      const annivItems = document.querySelectorAll('#anniv-list .anniv-item');
+      storeData.anniversaries = [];
+      annivItems.forEach(item => {
+        const datePicker = item.querySelector('.anniv-date-picker');
+        const date = (datePicker && datePicker.value) ? datePicker.value : (item.getAttribute('data-date') || '');
+        const title = item.querySelector('.anniv-title')?.textContent.trim() || '';
+        if (date || title) storeData.anniversaries.push([date, title]);
+      });
+
+      const mcItems = document.querySelectorAll('#mc-server-list .mc-tag-item');
+      storeData.mcServers = [];
+      mcItems.forEach(item => {
+        const txt = item.querySelector('.mc-tag-text')?.textContent.trim() || '';
+        if (txt) storeData.mcServers.push(txt);
+      });
+
+      const achItems = document.querySelectorAll('#achievement-list .achievement-item');
+      storeData.achievements = [];
+      achItems.forEach(item => {
+        const date = item.querySelector('.anniv-date')?.textContent.trim() || '';
+        const txt = item.querySelector('.info-text')?.textContent.trim() || '';
+        if (date || txt) storeData.achievements.push([date, txt]);
+      });
+
+      const gameItems = document.querySelectorAll('#game-list .game-card-item');
+      storeData.games = [];
+      gameItems.forEach(item => {
+        const title = item.querySelector('.game-title')?.textContent.trim() || '';
+        const ratingSelect = item.querySelector('.game-rating-select');
+        const rating = ratingSelect ? ratingSelect.value : '⭐⭐⭐⭐⭐⭐';
+        const date = item.querySelector('.game-date-text')?.textContent.trim() || '';
+        const review = item.querySelector('.game-review-text')?.textContent.trim() || '';
+        if (title || review) storeData.games.push([title, rating, date, review]);
+      });
+
+      const tmiItems = document.querySelectorAll('#tmi-list .tmi-item');
+      storeData.tmi = [];
+      tmiItems.forEach(item => {
+        const tag = item.querySelector('.tmi-tag')?.textContent.trim() || '💡 TMI';
+        const txt = item.querySelector('.tmi-content-text')?.textContent.trim() || '';
+        if (tag || txt) storeData.tmi.push([tag, txt]);
+      });
+    }
+
+    function renderFromJSON(data) {
+      if (!data) return;
+
+      if (data.theme) {
+        storeData.theme = { ...data.theme };
+        if (data.theme.bg) document.documentElement.style.setProperty('--bg-color', data.theme.bg);
+        if (data.theme.accent) document.documentElement.style.setProperty('--accent-color', data.theme.accent);
+        if (data.theme.text) document.documentElement.style.setProperty('--text-color', data.theme.text);
+        if (data.theme.tabText) document.documentElement.style.setProperty('--tab-text-color', data.theme.tabText);
+
+        const pBg = document.getElementById('picker-bg');
+        const pAccent = document.getElementById('picker-accent');
+        const pText = document.getElementById('picker-text');
+        const pTabText = document.getElementById('picker-tab-text');
+        if (pBg) pBg.value = data.theme.bg;
+        if (pAccent) pAccent.value = data.theme.accent;
+        if (pText) pText.value = data.theme.text;
+        if (pTabText) pTabText.value = data.theme.tabText;
+      }
+
+      if (data.cardOrderLeft && Array.isArray(data.cardOrderLeft)) {
+        const leftCol = document.querySelector('.main-col-left');
+        if (leftCol) {
+          data.cardOrderLeft.forEach(id => {
+            const card = document.getElementById(id);
+            if (card && card.parentElement === leftCol) leftCol.appendChild(card);
+          });
+        }
+      }
+      if (data.cardOrderRight && Array.isArray(data.cardOrderRight)) {
+        const rightCol = document.querySelector('.main-col-right');
+        if (rightCol) {
+          data.cardOrderRight.forEach(id => {
+            const card = document.getElementById(id);
+            if (card && card.parentElement === rightCol) rightCol.appendChild(card);
+          });
+        }
+      }
+
+      const nameEl = document.getElementById('profile-name');
+      const bioEl = document.getElementById('profile-bio');
+      const imgEl = document.getElementById('profile-img-element');
+      const gameBioEl = document.getElementById('game-bio');
+
+      if (nameEl && data.profile && data.profile.name) nameEl.textContent = data.profile.name;
+      if (bioEl && data.profile && data.profile.bio) bioEl.textContent = data.profile.bio;
+      if (imgEl && data.profile && data.profile.img) {
+        imgEl.src = data.profile.img;
+        imgEl.setAttribute('src', data.profile.img);
+      }
+
+      if (gameBioEl) {
+        const targetBio = (data && data.gameBio && getCleanPlainText(data.gameBio).length > 0) 
+          ? data.gameBio 
+          : DEFAULT_GAME_BIO;
+        gameBioEl.innerHTML = targetBio;
+        if (data) data.gameBio = targetBio;
+        storeData.gameBio = targetBio;
+      }
+
+      if (data.videoUrl !== undefined) {
+        const vInput = document.getElementById('video-url-input');
+        if (vInput) vInput.value = data.videoUrl;
+      }
+      if (data.videoType !== undefined) {
+        const vType = document.getElementById('video-type-select');
+        if (vType) vType.value = data.videoType;
+      }
+      updateVideoPlayer(true);
+
+      const grid = document.querySelector('.profile-info-grid');
+      if (grid && data.infoGrid) {
+        grid.innerHTML = data.infoGrid.map(item => {
+          const label = item[0];
+          const val = item[1];
+          const isFullClass = (item.length >= 3) ? (item[2] ? 'full-width' : '') : (['출생','주컨텐츠','좋아하는 게임'].includes(label) ? 'full-width' : '');
+
+          if (label === '첫방송') {
+            return `
+              <div class="info-box-item ${isFullClass}">
+                <span class="info-box-label" contenteditable="false">${escapeHtml(label)}</span>
+                <div style="flex:1 1 auto; text-align:right; display:flex; align-items:center; justify-content:flex-end; gap:4px; min-width:0;">
+                  <span class="admin-only" style="display:none;"><input type="date" class="date-input" id="first-stream-picker" value="${escapeAttr(formatYMD(val))}" onchange="updateStreamDays()" style="font-size:0.75rem; padding:2px 4px; width:110px;"></span>
+                  <span class="info-box-val" id="first-stream-text" contenteditable="false">${escapeHtml(val)}</span>
+                </div>
+                <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
+              </div>`;
+          } else if (label === '방송일차') {
+            return `
+              <div class="info-box-item ${isFullClass}">
+                <span class="info-box-label" contenteditable="false">${escapeHtml(label)}</span>
+                <div style="flex:1; text-align:right;"><span class="stream-days-badge" id="stream-days-display">${escapeHtml(val)}</span></div>
+                <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
+              </div>`;
+          }
+
+          return `
+            <div class="info-box-item ${isFullClass}">
+              <span class="info-box-label" contenteditable="false">${escapeHtml(label)}</span>
+              <span class="info-box-val" contenteditable="false">${escapeHtml(val)}</span>
+              <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
+              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+              <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
+            </div>`;
+        }).join('');
+        updateStreamDays(true);
+      }
+
+      const linkList = document.getElementById('link-list');
+      if (linkList && data.links) {
+        linkList.innerHTML = data.links.map(item => `
+          <div class="item-row link-item">
+            <div class="link-anchor" data-href="${escapeAttr(item[1])}" onclick="handleLinkAnchorClick(this)">
+              <span class="link-name">${escapeHtml(item[0])}</span><span>→</span>
+            </div>
+            <div class="link-edit-box admin-only flex">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                <span contenteditable="false" class="link-name-edit" style="font-weight:700; flex:1;">${escapeHtml(item[0])}</span>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn admin-only" onclick="this.closest('.link-item').remove(); triggerAutoSave();">삭제 ×</button>
+              </div>
+              <input type="text" class="url-input" value="${escapeAttr(item[1])}" placeholder="https://" oninput="this.setAttribute('value', this.value)">
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const schList = document.getElementById('schedule-list');
+      if (schList && data.schedules) {
+        schList.innerHTML = data.schedules.map(item => {
+          const contentStr = (item[1] || '');
+          const isOffDay = contentStr.includes('휴방') || item[3] === '휴방' || !item[3];
+          return `
+            <div class="item-row schedule-item">
+              <div class="schedule-view-box">
+                <span class="day-badge">${escapeHtml(item[0])}</span>
+                <span class="info-text">${escapeHtml(contentStr)}</span>
+                <span class="sub-text" style="display:${isOffDay ? 'none' : 'inline-block'};">${escapeHtml(item[2])} ${escapeHtml(item[3])}</span>
+              </div>
+              <div class="schedule-edit-box admin-only flex" style="flex-direction:row; align-items:center; width:100%; gap:6px;">
+                <select class="sch-day-select select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+                  <option value="월요일" ${item[0]==='월요일'?'selected="selected"':''}>월요일</option>
+                  <option value="화요일" ${item[0]==='화요일'?'selected="selected"':''}>화요일</option>
+                  <option value="수요일" ${item[0]==='수요일'?'selected="selected"':''}>수요일</option>
+                  <option value="목요일" ${item[0]==='목요일'?'selected="selected"':''}>목요일</option>
+                  <option value="금요일" ${item[0]==='금요일'?'selected="selected"':''}>금요일</option>
+                  <option value="토요일" ${item[0]==='토요일'?'selected="selected"':''}>토요일</option>
+                  <option value="일요일" ${item[0]==='일요일'?'selected="selected"':''}>일요일</option>
+                </select>
+                <span contenteditable="false" class="sch-content-edit info-text" style="font-weight:700; flex:1;" oninput="applyScheduleInputToView(); triggerAutoSave();">${escapeHtml(contentStr)}</span>
+                <div class="sch-time-zone-edit" style="display:flex; align-items:center; gap:4px;">
+                  <select class="sch-ampm select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+                    <option value="PM" ${item[2]==='PM'?'selected="selected"':''}>PM</option>
+                    <option value="AM" ${item[2]==='AM'?'selected="selected"':''}>AM</option>
+                  </select>
+                  <input type="text" class="time-text-input sch-time-val" value="${escapeAttr(item[3])}" oninput="applyScheduleInputToView(); this.setAttribute('value', this.value); triggerAutoSave();">
+                </div>
+                <button class="del-btn admin-only" onclick="this.closest('.schedule-item').remove(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const annivList = document.getElementById('anniv-list');
+      if (annivList && Array.isArray(data.anniversaries)) {
+        annivList.innerHTML = data.anniversaries.map(item => {
+          const dStr = (Array.isArray(item) ? item[0] : '') || '';
+          const titleStr = (Array.isArray(item) ? item[1] : '') || '';
+          return `
+            <div class="item-row anniv-item" data-date="${escapeAttr(dStr)}">
+              <span class="anniv-date">${escapeHtml(formatAnnivDate(dStr))}</span>
+              <span class="info-text anniv-title" contenteditable="false">${escapeHtml(titleStr)}</span>
+              <span class="dday-badge">${calculateDDay(dStr)}</span>
+              <div class="admin-only flex" style="gap:4px; align-items:center;">
+                <input type="date" class="date-input anniv-date-picker" value="${escapeAttr(formatYMD(dStr))}" onchange="updateAnnivDate(this)">
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn admin-only" onclick="this.closest('.anniv-item').remove(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const mcList = document.getElementById('mc-server-list');
+      if (mcList && data.mcServers) {
+        mcList.innerHTML = data.mcServers.map(item => `
+          <div class="mc-tag-item">
+            <span contenteditable="false" class="mc-tag-text">${escapeHtml(item)}</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">➡️</button>
+            <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
+          </div>
+        `).join('');
+      }
+
+      populateRestoredData(data);
+      updateAllPaginations();
+
+      if (getAdminState()) {
+        enterAdminMode();
+      } else {
+        exitAdminMode();
+      }
+    }
+
+    function populateRestoredData(overrideData = null) {
+      const targetData = overrideData || storeData;
+      const achList = document.getElementById('achievement-list');
+      const gameList = document.getElementById('game-list');
+      const tmiList = document.getElementById('tmi-list');
+
+      if (achList && targetData.achievements) {
+        achList.innerHTML = targetData.achievements.map((item, index) => `
+          <div class="item-row achievement-item" id="achieve-item-${index}">
+            <span class="anniv-date" contenteditable="false">${escapeHtml(item[0])}</span>
+            <span class="info-text" contenteditable="false">${escapeHtml(item[1])}</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+          </div>
+        `).join('');
+      }
+
+      if (gameList && targetData.games) {
+        gameList.innerHTML = targetData.games.map((item, index) => `
+          <div class="game-card-item" id="game-card-${index}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 contenteditable="false" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">${escapeHtml(item[0])}</h3>
+              <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
+                <option value="⭐⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐⭐ (6점)</option>
+                <option value="⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐ (5점)</option>
+                <option value="⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐ (4점)</option>
+                <option value="⭐⭐⭐" ${item[1]==='⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐ (3점)</option>
+                <option value="⭐⭐" ${item[1]==='⭐⭐'?'selected="selected"':''}>⭐⭐ (2점)</option>
+                <option value="⭐" ${item[1]==='⭐'?'selected="selected"':''}>⭐ (1점)</option>
+                <option value="☆☆☆☆☆☆" ${item[1]==='☆☆☆☆☆☆'?'selected="selected"':''}>☆☆☆☆☆☆ (0점 / 빈칸)</option>
+                <option value="별점 없음" ${item[1]==='별점 없음'?'selected="selected"':''}>별점 없음</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 플레이한 날짜:</span>
+              <span contenteditable="false" class="game-date-text" style="font-size:0.85rem; font-weight:700; color:var(--text-color);">${escapeHtml(item[2])}</span>
+            </div>
+            <div>
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
+              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6; white-space:pre-wrap;">${escapeHtml(item[3])}</div>
+            </div>
+            <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
+              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+              <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (tmiList && targetData.tmi) {
+        tmiList.innerHTML = targetData.tmi.map((item, index) => `
+          <div class="item-row tmi-item" id="tmi-item-${index}" style="flex-direction:column; align-items:flex-start; gap:8px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+            <div contenteditable="false" class="tmi-content-text" style="font-size:0.9rem; color:var(--text-color); line-height:1.6; width:100%; white-space:pre-wrap;">${escapeHtml(item[1])}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function handleAuthClick() {
+      if (getAdminState() || document.body.classList.contains('admin-mode')) {
+        if (confirm('로그아웃 하시겠습니까?')) {
+          setAdminState(false);
+          exitAdminMode();
+          location.reload();
+        }
+      } else {
+        openModal('login-modal');
+        const pwInput = document.getElementById('pw-input');
+        if (pwInput) { pwInput.value = ''; setTimeout(() => pwInput.focus(), 100); }
+      }
+    }
+
+    function verifyPassword() {
+      const pwInput = document.getElementById('pw-input');
+      if (pwInput && pwInput.value.trim() === getAdminPassword()) {
+        setAdminState(true);
+        enterAdminMode();
+        closeModal('login-modal');
+      } else {
+        const errEl = document.getElementById('error-msg');
+        if (errEl) errEl.style.display = 'block';
+      }
+    }
+
+    function openChangePwModal() {
+      openModal('change-pw-modal');
+      document.getElementById('new-pw-input').value = '';
+      document.getElementById('new-pw-confirm').value = '';
+      document.getElementById('change-pw-error').style.display = 'none';
+    }
+
+    function changePassword() {
+      const p1 = document.getElementById('new-pw-input').value.trim(); 
+      const p2 = document.getElementById('new-pw-confirm').value.trim();
+      if (p1 && p1 === p2) {
+        try { localStorage.setItem('admin_pw', p1); } catch(e) {}
+        cloudAdminPw = p1;
+        if (isFirebaseActive && db) db.ref('live_profile_json_v3/admin_pw').set(p1);
+        savePage(true);
+        alert('🔑 비밀번호가 전체 기기(PC/모바일)에 일괄 동기화되었습니다!');
+        closeModal('change-pw-modal');
+      } else {
+        const errEl = document.getElementById('change-pw-error');
+        if (errEl) errEl.style.display = 'block';
+      }
+    }
+
+    function enterAdminMode() {
+      document.body.classList.add('admin-mode'); 
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.textContent = "🔓 로그아웃"; 
+      const statusText = document.getElementById('status-text');
+      if (statusText) statusText.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
+      setEditable(true);
+      renderCalendar();
+    }
+
+    function exitAdminMode() {
+      document.body.classList.remove('admin-mode'); 
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.textContent = "🔒 관리자 로그인"; 
+      const statusText = document.getElementById('status-text');
+      if (statusText) statusText.textContent = "일반 모드";
+      setEditable(false);
+      applyLinkData();
+      applyScheduleInputToView();
+      refreshAllDDay();
+      updateStreamDays(true);
+      renderCalendar();
+    }
+
+    function setEditable(val) {
+      const editableSelectors = ['#profile-name', '#profile-bio', '#game-bio', '.info-box-label', '.info-box-val', '.link-name-edit', '.sch-content-edit', '.anniv-title', '.mc-tag-text', '.achievement-item .anniv-date', '.achievement-item .info-text', '.game-title', '.game-date-text', '.game-review-text', '.tmi-tag', '.tmi-content-text', '.cal-event-time', '.cal-event-text'];
+      document.querySelectorAll(editableSelectors.join(', ')).forEach(el => { el.setAttribute('contenteditable', val ? "true" : "false"); });
+      document.querySelectorAll('.game-rating-select').forEach(sel => { sel.disabled = !val; });
+    }
+
+    function switchTab(event, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+      } else {
+        const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick')?.includes(`'${tabId}'`));
+        if (targetBtn) targetBtn.classList.add('active');
+      }
+
+      const targetTab = document.getElementById('tab-' + tabId);
+      if (targetTab) targetTab.classList.add('active');
+      if (tabId === 'monthly') renderCalendar();
+    }
+
+    function openEventDetailModal(dateKey, time, text) {
+      const dateEl = document.getElementById('evt-detail-date');
+      const timeEl = document.getElementById('evt-detail-time');
+      const contentEl = document.getElementById('evt-detail-content');
+
+      if (dateKey) {
+        const parts = formatYMD(dateKey).split('-');
+        dateEl.textContent = parts.length === 3 ? `📅 ${parts[0]}년 ${parts[1]}월 ${parts[2]}일 일정` : `📅 ${dateKey} 일정`;
+      } else { dateEl.textContent = `📅 일정 상세보기`; }
+
+      if (time && time.trim()) {
+        timeEl.textContent = `⏰ 시간: ${time.trim()}`; timeEl.style.display = 'block';
+      } else { timeEl.textContent = ''; timeEl.style.display = 'none'; }
+
+      contentEl.textContent = text || '내용이 없습니다.';
+      openModal('event-detail-modal');
+    }
+
+    function renderPaginatedList(listId, paginationId, pageKey) {
+      const listEl = document.getElementById(listId);
+      if (!listEl) return;
+
+      let paginationEl = document.getElementById(paginationId);
+      if (!paginationEl) {
+        paginationEl = document.createElement('div');
+        paginationEl.className = 'pagination-bar';
+        paginationEl.id = paginationId;
+        if (listEl.parentElement) listEl.parentElement.appendChild(paginationEl);
+      }
+
+      const items = Array.from(listEl.children).filter(child => child.nodeType === 1 && !child.classList.contains('pagination-bar'));
+      const totalItems = items.length;
+      const itemsPerPage = pageLimit[pageKey] || 30;
+      const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+      if (pageState[pageKey] > totalPages) pageState[pageKey] = totalPages;
+      if (pageState[pageKey] < 1) pageState[pageKey] = 1;
+
+      const currentPage = pageState[pageKey];
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+
+      items.forEach((item, index) => {
+        item.style.display = (index >= startIndex && index < endIndex) ? 'flex' : 'none';
+      });
+
+      paginationEl.innerHTML = '';
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn'; prevBtn.textContent = '◀'; prevBtn.disabled = (currentPage === 1);
+      prevBtn.onclick = function() { if (pageState[pageKey] > 1) { pageState[pageKey]--; renderPaginatedList(listId, paginationId, pageKey); } };
+      paginationEl.appendChild(prevBtn);
+
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+        btn.textContent = i;
+        btn.onclick = function() { pageState[pageKey] = i; renderPaginatedList(listId, paginationId, pageKey); };
+        paginationEl.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn'; nextBtn.textContent = '▶'; nextBtn.disabled = (currentPage === totalPages);
+      nextBtn.onclick = function() { if (pageState[pageKey] < totalPages) { pageState[pageKey]++; renderPaginatedList(listId, paginationId, pageKey); } };
+      paginationEl.appendChild(nextBtn);
+
+      const limitSelect = document.createElement('select');
+      limitSelect.className = 'select-input';
+      limitSelect.style.cssText = 'font-size:0.75rem; padding:3px 6px; margin-left:6px;';
+      [10, 30, 50].forEach(num => {
+        const opt = document.createElement('option');
+        opt.value = num; opt.textContent = `${num}개씩 보기`;
+        if (num === itemsPerPage) opt.selected = true;
+        limitSelect.appendChild(opt);
+      });
+      limitSelect.onchange = function() {
+        pageLimit[pageKey] = parseInt(this.value, 10);
+        pageState[pageKey] = 1;
+        renderPaginatedList(listId, paginationId, pageKey);
+      };
+      paginationEl.appendChild(limitSelect);
+
+      const infoSpan = document.createElement('span');
+      infoSpan.style.cssText = 'font-size: 0.8rem; font-weight: 700; color: var(--accent-color); margin-left: 6px;';
+      infoSpan.textContent = `(${currentPage} / ${totalPages} 페이지, 총 ${totalItems}개)`;
+      paginationEl.appendChild(infoSpan);
+    }
+
+    function updateAllPaginations() {
+      renderPaginatedList('achievement-list', 'pagination-achievements', 'achievements');
+      renderPaginatedList('game-list', 'pagination-games', 'games');
+      renderPaginatedList('tmi-list', 'pagination-tmi', 'tmi');
+    }
+
+    function applyScheduleInputToView() {
+      document.querySelectorAll('.schedule-item').forEach(item => {
+        const daySelect = item.querySelector('.sch-day-select');
+        const contentEdit = item.querySelector('.sch-content-edit');
+        const ampmSelect = item.querySelector('.sch-ampm');
+        const timeValInput = item.querySelector('.sch-time-val');
+        const viewDay = item.querySelector('.day-badge');
+        const viewContent = item.querySelector('.info-text');
+        const viewTime = item.querySelector('.sub-text');
+
+        if(daySelect && contentEdit && ampmSelect && timeValInput && viewDay && viewContent && viewTime) {
+          viewDay.textContent = daySelect.value;
+          const contentStr = contentEdit.textContent.trim();
+          viewContent.textContent = contentStr;
+          const cleanTime = timeValInput.value.trim();
+          if (contentStr.includes('휴방') || cleanTime === '휴방' || !cleanTime) {
+            viewTime.style.display = 'none';
+          } else {
+            viewTime.style.display = 'inline-block';
+            viewTime.textContent = [ampmSelect.value, cleanTime].filter(Boolean).join(' ');
+          }
+        }
+      });
+    }
+
+    function handleLinkAnchorClick(el) {
+      if (!document.body.classList.contains('admin-mode')) {
+        let targetUrl = (el.getAttribute('data-href') || '').trim();
+        if (targetUrl && !targetUrl.match(/^https?:\/\//i)) targetUrl = 'https://' + targetUrl;
+        if (targetUrl && targetUrl !== 'https://#') window.open(targetUrl, '_blank');
+      }
+    }
+
+    function adjustPaginationAfterMove(parent, movedRow) {
+      const listId = parent ? parent.id : '';
+      let pageKey = '';
+      if (listId === 'achievement-list') pageKey = 'achievements';
+      else if (listId === 'game-list') pageKey = 'games';
+      else if (listId === 'tmi-list') pageKey = 'tmi';
+
+      if (pageKey) {
+        const items = Array.from(parent.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+        const movedIndex = items.indexOf(movedRow);
+        if (movedIndex !== -1) {
+          const itemsPerPage = pageLimit[pageKey] || 30;
+          const targetPage = Math.floor(movedIndex / itemsPerPage) + 1;
+          pageState[pageKey] = targetPage;
+        }
+      }
+    }
+
+    function moveRowUp(btn) {
+      const row = btn.closest('.info-box-item, .link-item, .schedule-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      if (row && row.previousElementSibling) {
+        const parent = row.parentElement;
+        parent.insertBefore(row, row.previousElementSibling);
+        adjustPaginationAfterMove(parent, row);
+        updateAllPaginations();
+        triggerAutoSave();
+      }
+    }
+
+    function moveRowDown(btn) {
+      const row = btn.closest('.info-box-item, .link-item, .schedule-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      if (row && row.nextElementSibling) {
+        const parent = row.parentElement;
+        parent.insertBefore(row.nextElementSibling, row);
+        adjustPaginationAfterMove(parent, row);
+        updateAllPaginations();
+        triggerAutoSave();
+      }
+    }
+
+    function moveCardUp(btn) {
+      const card = btn.closest('.main-card-item');
+      if (card && card.previousElementSibling && card.previousElementSibling.classList.contains('main-card-item')) {
+        card.parentElement.insertBefore(card, card.previousElementSibling);
+        triggerAutoSave();
+      }
+    }
+
+    function moveCardDown(btn) {
+      const card = btn.closest('.main-card-item');
+      if (card && card.nextElementSibling && card.nextElementSibling.classList.contains('main-card-item')) {
+        card.parentElement.insertBefore(card, card.nextElementSibling);
+        triggerAutoSave();
+      }
+    }
+
+    function toggleBoxWidth(btn) {
+      const box = btn.parentElement;
+      if (box) { box.classList.toggle('full-width'); triggerAutoSave(); }
+    }
+
+    function handleGlobalSearch(query) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      const clearBtn = document.getElementById('search-clear-btn');
+      const keyword = query.trim().toLowerCase();
+      if (!keyword) { dropdown.style.display = 'none'; clearBtn.style.display = 'none'; return; }
+      clearBtn.style.display = 'inline-block'; dropdown.innerHTML = '';
+
+      const targets = [
+        { id: 'tab-main', tabName: 'main', badge: '🎀 메인 프로필' },
+        { id: 'tab-achievements', tabName: 'achievements', badge: '🏆 방송 업적' },
+        { id: 'tab-games', tabName: 'games', badge: '🎮 플레이 게임' },
+        { id: 'tab-tmi', tabName: 'tmi', badge: '💬 TMI & 여담' }
+      ];
+
+      const results = [];
+      targets.forEach(target => {
+        const tabEl = document.getElementById(target.id);
+        if (!tabEl) return;
+        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .game-card-item');
+        items.forEach((item, idx) => {
+          const clone = item.cloneNode(true);
+          clone.querySelectorAll('.admin-only, button, select, input').forEach(el => el.remove());
+          const txt = clone.textContent.replace(/\s+/g, ' ').trim();
+
+          if (txt && txt.toLowerCase().includes(keyword)) {
+            let clean = txt;
+            if (clean.length > 45) clean = clean.substring(0, 45) + '...';
+            if (!item.id) item.id = `search-target-${target.tabName}-${idx}`;
+            results.push({ text: clean, tabName: target.tabName, badge: target.badge, elementId: item.id });
+          }
+        });
+      });
+
+      if (results.length === 0) {
+        dropdown.innerHTML = '<div style="padding:12px; font-size:0.85rem; font-weight:700; text-align:center;">🔍 검색 결과가 없습니다.</div>';
+      } else {
+        results.slice(0, 15).forEach(res => {
+          const div = document.createElement('div');
+          div.className = 'search-result-item';
+          div.innerHTML = `<span class="search-result-text">${escapeHtml(res.text)}</span><span class="search-result-badge">${res.badge}</span>`;
+          div.onclick = function() { jumpToSearchResult(res.tabName, res.elementId); };
+          dropdown.appendChild(div);
+        });
+      }
+      dropdown.style.display = 'flex';
+    }
+
+    function jumpToSearchResult(tabName, elementId) {
+      document.getElementById('search-results-dropdown').style.display = 'none';
+      switchTab(null, tabName);
+
+      setTimeout(() => {
+        let targetEl = document.getElementById(elementId);
+        const parent = targetEl?.parentElement || document.querySelector(`#tab-${tabName} .list-wrapper`);
+
+        if (parent) {
+          let pageKey = '';
+          if (parent.id === 'achievement-list') pageKey = 'achievements';
+          else if (parent.id === 'game-list') pageKey = 'games';
+          else if (parent.id === 'tmi-list') pageKey = 'tmi';
+
+          if (pageKey) {
+            const items = Array.from(parent.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+            if (!targetEl && items.length > 0) targetEl = items[0];
+            const idx = items.indexOf(targetEl);
+            if (idx !== -1) {
+              const itemsPerPage = pageLimit[pageKey] || 30;
+              pageState[pageKey] = Math.floor(idx / itemsPerPage) + 1;
+              renderPaginatedList(parent.id, 'pagination-' + pageKey, pageKey);
+            }
+          }
+        }
+
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.add('search-highlight');
+          setTimeout(() => targetEl.classList.remove('search-highlight'), 2400);
+        }
+      }, 150);
+    }
+
+    function clearGlobalSearch() {
+      const input = document.getElementById('global-search-input');
+      input.value = ''; handleGlobalSearch(''); input.focus();
+    }
+
+    function triggerAutoSave() {
+      if (!document.body.classList.contains('admin-mode')) return;
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => { savePage(true); }, 800);
+    }
+
+    document.addEventListener('input', function(e) {
+      if (document.body.classList.contains('admin-mode') && e.target.isContentEditable) {
+        triggerAutoSave();
+      }
+    });
+
+    function updateAnnivDate(inputEl) {
+      const parent = inputEl.closest('.anniv-item');
+      if (!parent) return;
+      const selectedDate = inputEl.value;
+      if (!selectedDate) return;
+      inputEl.setAttribute('value', selectedDate);
+      parent.setAttribute('data-date', selectedDate);
+      const parts = formatYMD(selectedDate).split('-');
+      if (parts.length === 3) parent.querySelector('.anniv-date').textContent = `${parts[1].padStart(2, '0')}.${parts[2].padStart(2, '0')}`;
+      parent.querySelector('.dday-badge').textContent = calculateDDay(selectedDate);
+      triggerAutoSave();
+    }
+
+    function refreshAllDDay() {
+      document.querySelectorAll('.anniv-item').forEach(item => {
+        const dateStr = item.getAttribute('data-date');
+        if (dateStr) item.querySelector('.dday-badge').textContent = calculateDDay(dateStr);
+      });
+    }
+
+    function updateStreamDays(skipAutoSave = false) {
+      const datePicker = document.getElementById('first-stream-picker');
+      const displayBadge = document.getElementById('stream-days-display');
+      const textDisplay = document.getElementById('first-stream-text');
+      if (!datePicker) return;
+      const startDateStr = datePicker.value || (textDisplay ? textDisplay.textContent : '');
+      if (!startDateStr) return;
+      datePicker.setAttribute('value', startDateStr);
+      const parts = formatYMD(startDateStr).split('-');
+      if (parts.length === 3 && textDisplay) textDisplay.textContent = `${parts[0]}.${parts[1]}.${parts[2]}`;
+
+      if (displayBadge) {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const start = parseLocalDate(startDateStr); start.setHours(0, 0, 0, 0);
+        const diffTime = today.getTime() - start.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0) displayBadge.textContent = `${diffDays + 1}일차 🎉`;
+        else displayBadge.textContent = `D-${Math.abs(diffDays)}`;
+      }
+      if (!skipAutoSave) triggerAutoSave();
+    }
+
+    function parseVideoEmbedUrl(rawUrl) {
+      if (!rawUrl) return '';
+      let url = rawUrl.trim();
+
+      if (url.includes('<iframe') && url.includes('src=')) {
+        const match = url.match(/src=["']([^"']+)["']/i);
+        if (match && match[1]) url = match[1];
+      }
+
+      let videoId = '';
+      if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split('?')[0].split('&')[0].split('#')[0];
+      } else if (url.includes('youtube.com/shorts/')) {
+        videoId = url.split('youtube.com/shorts/')[1].split('?')[0].split('&')[0].split('#')[0];
+      } else if (url.includes('youtube.com/watch')) {
+        try {
+          const parsed = new URL(url);
+          videoId = parsed.searchParams.get('v') || '';
+        } catch(e) {
+          const m = url.match(/[?&]v=([^&]+)/);
+          if (m) videoId = m[1];
+        }
+      } else if (url.includes('youtube.com/embed/')) {
+        return url;
+      }
+
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+
+      return url;
+    }
+
+    function updateVideoPlayer(skipAutoSave = false) {
+      const inputEl = document.getElementById('video-url-input');
+      const selectEl = document.getElementById('video-type-select');
+      const iframeEl = document.getElementById('main-video-iframe');
+      const videoEl = document.getElementById('main-video-element');
+      if (!inputEl || !iframeEl || !videoEl) return;
+
+      const rawUrl = inputEl.value.trim();
+      const videoType = selectEl ? selectEl.value : 'auto';
+      const embedUrl = parseVideoEmbedUrl(rawUrl);
+
+      inputEl.setAttribute('value', rawUrl);
+
+      if (videoType === 'mp4' || (videoType === 'auto' && (rawUrl.endsWith('.mp4') || rawUrl.endsWith('.webm') || rawUrl.endsWith('.ogg')))) {
+        iframeEl.style.display = 'none';
+        iframeEl.src = '';
+        videoEl.style.display = 'block';
+        if (videoEl.src !== rawUrl) videoEl.src = rawUrl;
+      } else {
+        videoEl.style.display = 'none';
+        videoEl.src = '';
+        iframeEl.style.display = 'block';
+        if (iframeEl.src !== embedUrl) iframeEl.src = embedUrl;
+      }
+
+      if (!skipAutoSave) triggerAutoSave();
+    }
+
+    function renderCalendar() {
+      const calTitle = document.getElementById('calendar-title');
+      if (calTitle) calTitle.textContent = `${currentYear}년 ${currentMonth + 1}월`;
+      const calBody = document.getElementById('calendar-body'); 
+      if (!calBody) return; calBody.innerHTML = '';
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div'); emptyCell.className = 'cal-cell empty-cell'; calBody.appendChild(emptyCell);
+      }
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+      for (let date = 1; date <= lastDate; date++) {
+        const cell = document.createElement('div'); cell.className = 'cal-cell';
+        const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
+        const cellHeader = document.createElement('div'); cellHeader.className = 'cal-cell-header';
+        const num = document.createElement('span'); num.className = 'cal-num'; num.textContent = date;
+        cellHeader.appendChild(num);
+        if (isAdmin) {
+          const addEvtBtn = document.createElement('button'); addEvtBtn.className = 'cal-add-evt-btn'; addEvtBtn.textContent = '+';
+          addEvtBtn.onclick = function() { addCalendarEventItem(dateKey, '', ''); };
+          cellHeader.appendChild(addEvtBtn);
+        }
+        cell.appendChild(cellHeader);
+        const evtList = document.createElement('div'); evtList.className = 'cal-event-list'; evtList.id = `cal-evt-list-${dateKey}`;
+        let events = calendarEvents[dateKey] || [];
+        events.forEach(evtObj => renderEventItem(evtList, dateKey, evtObj.time || '', evtObj.text || '', isAdmin));
+        cell.appendChild(evtList); calBody.appendChild(cell);
+      }
+    }
+
+    function renderEventItem(container, dateKey, time, text, isAdmin) {
+      const item = document.createElement('div'); 
+      item.className = 'cal-event-item';
+      item.style.cursor = 'pointer';
+      item.onclick = function(e) {
+        if (!document.body.classList.contains('admin-mode')) {
+          openEventDetailModal(dateKey, time, text);
+        }
+      };
+
+      const topRow = document.createElement('div'); topRow.className = 'cal-event-top';
+      const timeSpan = document.createElement('span'); timeSpan.className = 'cal-event-time'; timeSpan.textContent = time;
+      timeSpan.contentEditable = isAdmin ? "true" : "false";
+      timeSpan.oninput = function() { saveCalendarEventsFromDOM(); triggerAutoSave(); };
+      topRow.appendChild(timeSpan);
+
+      if (isAdmin) {
+        const delBtn = document.createElement('button'); delBtn.className = 'cal-event-del'; delBtn.innerHTML = '×';
+        delBtn.onclick = function(e) { e.stopPropagation(); item.remove(); saveCalendarEventsFromDOM(); triggerAutoSave(); };
+        topRow.appendChild(delBtn);
+      }
+      item.appendChild(topRow);
+
+      const textSpan = document.createElement('span'); 
+      textSpan.className = 'cal-event-text'; 
+      textSpan.textContent = text || '새 일정';
+      textSpan.contentEditable = isAdmin ? "true" : "false";
+      textSpan.oninput = function() { saveCalendarEventsFromDOM(); triggerAutoSave(); };
+      item.appendChild(textSpan);
+
+      container.appendChild(item);
+    }
+
+    function addCalendarEventItem(dateKey, time, text) {
+      let eventText = text || prompt('일정 내용을 입력하세요:', '새 일정');
+      if (eventText === null) return;
+      if (!calendarEvents[dateKey]) calendarEvents[dateKey] = [];
+      calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
+      renderCalendar(); saveCalendarEventsFromDOM(); triggerAutoSave();
+    }
+
+    function saveCalendarEventsFromDOM() {
+      const cells = document.querySelectorAll('.cal-cell:not(.empty-cell)');
+      cells.forEach(cell => {
+        const listContainer = cell.querySelector('.cal-event-list');
+        if (listContainer) {
+          const dateKey = listContainer.id.replace('cal-evt-list-', '');
+          const items = listContainer.querySelectorAll('.cal-event-item');
+          const arr = [];
+          items.forEach(item => {
+            const timeVal = item.querySelector('.cal-event-time')?.textContent.trim() || '';
+            const textVal = item.querySelector('.cal-event-text')?.textContent.trim() || '';
+            if (timeVal || textVal) arr.push({ time: timeVal, text: textVal });
+          });
+          if (arr.length > 0) calendarEvents[dateKey] = arr;
+          else delete calendarEvents[dateKey];
+        }
+      });
+    }
+
+    function moveMonth(delta) {
+      saveCalendarEventsFromDOM(); currentMonth += delta;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar();
+    }
+
+    function manualSavePage() { savePage(false); }
+
+    function savePage(isSilent = false) {
+      if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+      const statusEl = document.getElementById('status-text');
+      if (statusEl && document.body.classList.contains('admin-mode')) statusEl.textContent = "관리자 모드 (🟡 서버 전송 중...)";
+
+      try {
+        extractStoreDataFromDOM();
+        saveCalendarEventsFromDOM();
+
+        const nowTimestamp = Date.now();
+        const currentPw = getAdminPassword();
+        try {
+          localStorage.setItem('last_updated_at', nowTimestamp.toString());
+          localStorage.setItem('applied_cloud_version', nowTimestamp.toString());
+          localStorage.setItem('local_store_data', JSON.stringify(storeData));
+          localStorage.setItem('local_cal_events', JSON.stringify(calendarEvents));
+        } catch(e) {}
+
+        if (isFirebaseActive && db) {
+          isFirebaseSaving = true;
+          db.ref('live_profile_json_v3').set({
+            storeData: storeData,
+            cal_events: JSON.stringify(calendarEvents),
+            admin_pw: currentPw,
+            updated_at: nowTimestamp
+          }).then(() => {
+            isFirebaseSaving = false;
+            if (statusEl && document.body.classList.contains('admin-mode')) statusEl.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
+          }).catch(e => { isFirebaseSaving = false; });
+        }
+
+        if (!isSilent) {
+          alert('✨ 수정한 내용이 실시간으로 적용/저장되었습니다!');
+          if (getAdminState()) enterAdminMode();
+          else exitAdminMode();
+        }
+      } catch (err) {
+        if (!isSilent) alert('⚠️ 저장 처리 중 오류 발생: ' + err.message);
+      }
+    }
+
+    function addProfileInfoItem() {
+      const grid = document.querySelector('.profile-info-grid'); if (!grid) return;
+      const div = document.createElement('div'); div.className = 'info-box-item';
+      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      grid.appendChild(div); setEditable(true); triggerAutoSave();
+    }
+
+    function addMcServerItem() {
+      const list = document.getElementById('mc-server-list');
+      const div = document.createElement('div'); div.className = 'mc-tag-item';
+      div.innerHTML = `<span contenteditable="true" class="mc-tag-text">서버 이름</span><button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">➡️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      list.appendChild(div); setEditable(true); triggerAutoSave();
+    }
+
+    function addAchievementItem() {
+      const list = document.getElementById('achievement-list');
+      if (!list) return;
+      const today = new Date();
+      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'item-row achievement-item';
+      div.innerHTML = `
+        <span class="anniv-date" contenteditable="true">${todayYm}</span>
+        <span class="info-text" contenteditable="true">달성했던 방송 업적 및 기록 기재</span>
+        <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+        <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+        <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['achievements'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['achievements'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('achievement-list', 'pagination-achievements', 'achievements');
+
+      triggerAutoSave();
+    }
+
+    function addGameItem() {
+      const list = document.getElementById('game-list');
+      if (!list) return;
+      const today = new Date();
+      const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'game-card-item';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <h3 contenteditable="true" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">새 게임 제목</h3>
+          <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
+            <option value="⭐⭐⭐⭐⭐⭐" selected="selected">⭐⭐⭐⭐⭐⭐ (6점)</option>
+            <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ (5점)</option>
+            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ (4점)</option>
+            <option value="⭐⭐⭐">⭐⭐⭐ (3점)</option>
+            <option value="⭐⭐">⭐⭐ (2점)</option>
+            <option value="⭐">⭐ (1점)</option>
+            <option value="☆☆☆☆☆☆">☆☆☆☆☆☆ (0점 / 빈칸)</option>
+            <option value="별점 없음">별점 없음</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 날짜:</span>
+          <span contenteditable="true" class="game-date-text" style="font-size:0.85rem; font-weight:700;">${todayFormatted}</span>
+        </div>
+        <div>
+          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6;">게임 후기를 작성하세요.</div>
+        </div>
+        <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
+          <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+          <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
+        </div>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['games'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['games'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('game-list', 'pagination-games', 'games');
+
+      triggerAutoSave();
+    }
+
+    function addTmiItem() {
+      const list = document.getElementById('tmi-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'item-row tmi-item';
+      div.style.cssText = 'flex-direction:column; align-items:flex-start; gap:8px;';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+          <span contenteditable="true" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706;">💡 TMI</span>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+          </div>
+        </div>
+        <div contenteditable="true" class="tmi-content-text" style="font-size:0.9rem; width:100%;">TMI 내용 입력</div>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['tmi'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['tmi'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('tmi-list', 'pagination-tmi', 'tmi');
+
+      triggerAutoSave();
+    }
+
+    function addLink() {
+      const list = document.getElementById('link-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'item-row link-item';
+      div.innerHTML = `
+        <div class="link-anchor" data-href="https://" onclick="handleLinkAnchorClick(this)">
+          <span class="link-name">새로운 링크</span><span>→</span>
+        </div>
+        <div class="link-edit-box admin-only flex">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <span contenteditable="true" class="link-name-edit" style="font-weight:700; flex:1;" oninput="applyLinkData(); triggerAutoSave();">새로운 링크</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="del-btn admin-only" onclick="this.closest('.link-item').remove(); triggerAutoSave();">삭제 ×</button>
+          </div>
+          <input type="text" class="url-input" value="https://" placeholder="https://" oninput="applyLinkData(); this.setAttribute('value', this.value); triggerAutoSave();">
+        </div>`;
+      list.appendChild(div);
+      applyLinkData();
+      setEditable(true);
+      triggerAutoSave();
+    }
+
+    function addSchedule() {
+      const list = document.getElementById('schedule-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'item-row schedule-item';
+      div.innerHTML = `
+        <div class="schedule-view-box">
+          <span class="day-badge">월요일</span>
+          <span class="info-text">정규 라이브 방송</span>
+          <span class="sub-text" style="display:inline-block;">PM 20:00</span>
+        </div>
+        <div class="schedule-edit-box admin-only flex" style="flex-direction:row; align-items:center; width:100%; gap:6px;">
+          <select class="sch-day-select select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+            <option value="월요일" selected="selected">월요일</option>
+            <option value="화요일">화요일</option>
+            <option value="수요일">수요일</option>
+            <option value="목요일">목요일</option>
+            <option value="금요일">금요일</option>
+            <option value="토요일">토요일</option>
+            <option value="일요일">일요일</option>
+          </select>
+          <span contenteditable="true" class="sch-content-edit info-text" style="font-weight:700; flex:1;" oninput="applyScheduleInputToView(); triggerAutoSave();">정규 라이브 방송</span>
+          <div class="sch-time-zone-edit" style="display:flex; align-items:center; gap:4px;">
+            <select class="sch-ampm select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+              <option value="PM" selected="selected">PM</option>
+              <option value="AM">AM</option>
+            </select>
+            <input type="text" class="time-text-input sch-time-val" value="20:00" placeholder="20:00" oninput="applyScheduleInputToView(); this.setAttribute('value', this.value); triggerAutoSave();">
+          </div>
+          <button class="del-btn admin-only" onclick="this.closest('.schedule-item').remove(); triggerAutoSave();">×</button>
+        </div>`;
+      list.appendChild(div);
+      applyScheduleInputToView();
+      setEditable(true);
+      triggerAutoSave();
+    }
+
+    function addAnniversary() {
+      const list = document.getElementById('anniv-list');
+      if (!list) return;
+      const today = new Date();
+      const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'item-row anniv-item';
+      div.setAttribute('data-date', todayYmd);
+      div.innerHTML = `
+        <span class="anniv-date">${formatAnnivDate(todayYmd)}</span>
+        <span class="info-text anniv-title" contenteditable="true">기념일 내용</span>
+        <span class="dday-badge">D-Day</span>
+        <div class="admin-only flex" style="gap:4px; align-items:center;">
+          <input type="date" class="date-input anniv-date-picker" value="${todayYmd}" onchange="updateAnnivDate(this);">
+          <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+          <button class="del-btn admin-only" onclick="this.closest('.anniv-item').remove(); triggerAutoSave();">×</button>
+        </div>`;
+      list.appendChild(div);
+      setEditable(true);
+      refreshAllDDay();
+      triggerAutoSave();
+    }
+
+    function openThemeModal() { 
+      const theme = storeData.theme || { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
+      tempOriginalTheme = { ...theme };
+
+      const pBg = document.getElementById('picker-bg');
+      const pAccent = document.getElementById('picker-accent');
+      const pText = document.getElementById('picker-text');
+      const pTabText = document.getElementById('picker-tab-text');
+
+      if (pBg) pBg.value = theme.bg || '#fff0f5';
+      if (pAccent) pAccent.value = theme.accent || '#ff4d73';
+      if (pText) pText.value = theme.text || '#5c3a42';
+      if (pTabText) pTabText.value = theme.tabText || '#ff758c';
+
+      openModal('theme-modal'); 
+    }
+
+    function cancelThemeModal() { 
+      if (tempOriginalTheme) {
+        document.documentElement.style.setProperty('--bg-color', tempOriginalTheme.bg);
+        document.documentElement.style.setProperty('--accent-color', tempOriginalTheme.accent);
+        document.documentElement.style.setProperty('--text-color', tempOriginalTheme.text);
+        document.documentElement.style.setProperty('--tab-text-color', tempOriginalTheme.tabText);
+        storeData.theme = { ...tempOriginalTheme };
+        triggerAutoSave();
+      }
+      closeModal('theme-modal'); 
+    }
+
+    function applyCustomTheme() {
+      const bg = document.getElementById('picker-bg').value;
+      const accent = document.getElementById('picker-accent').value;
+      const text = document.getElementById('picker-text').value;
+      const tabText = document.getElementById('picker-tab-text').value;
+
+      document.documentElement.style.setProperty('--bg-color', bg);
+      document.documentElement.style.setProperty('--accent-color', accent);
+      document.documentElement.style.setProperty('--text-color', text);
+      document.documentElement.style.setProperty('--tab-text-color', tabText);
+
+      storeData.theme = { bg, accent, text, tabText };
+      triggerAutoSave();
+    }
+
+    function saveThemeSettings() { 
+      applyCustomTheme();
+      closeModal('theme-modal'); 
+      savePage(false); 
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150; canvas.height = 150;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
+            const compressed = canvas.toDataURL('image/jpeg', 0.75);
+
+            const profileImgEl = document.getElementById('profile-img-element');
+            if (profileImgEl) {
+              profileImgEl.src = compressed;
+              profileImgEl.setAttribute('src', compressed);
+            }
+
+            if (!storeData.profile) storeData.profile = {};
+            storeData.profile.img = compressed;
+            ImageStore.saveImage('profile_img', compressed);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function openBulkPasteModal(target) {
+      currentBulkPasteTarget = target;
+      document.getElementById('bulk-paste-title').textContent = '📋 여러 줄 한 번에 붙여넣기';
+      document.getElementById('bulk-paste-text').value = '';
+      openModal('bulk-paste-modal');
+    }
+
+    function applyBulkPaste() {
+      extractStoreDataFromDOM();
+      const rawText = document.getElementById('bulk-paste-text').value;
+      if (!rawText.trim()) { closeModal('bulk-paste-modal'); return; }
+      const lines = rawText.split('\n');
+      const today = new Date();
+      const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+      if (currentBulkPasteTarget === 'achievements') {
+        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYm, line.trim()]); });
+      } else if (currentBulkPasteTarget === 'games') {
+        lines.forEach(line => { if (line.trim()) storeData.games.push([line.trim(), "⭐⭐⭐⭐⭐⭐", todayFormatted, "후기 기재"]); });
+      } else if (currentBulkPasteTarget === 'tmi') {
+        lines.forEach(line => { if (line.trim()) storeData.tmi.push(["💡 TMI", line.trim()]); });
+      }
+      closeModal('bulk-paste-modal'); 
+      renderFromJSON(storeData); 
+      triggerAutoSave();
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const localStore = localStorage.getItem('local_store_data');
+        const localCal = localStorage.getItem('local_cal_events');
+        if (localStore) {
+          const parsed = JSON.parse(localStore);
+          if (parsed && typeof parsed === 'object') storeData = parsed;
+        }
+        if (localCal) {
+          const parsedCal = JSON.parse(localCal);
+          if (parsedCal) calendarEvents = parsedCal;
+        }
+      } catch(e) {}
+
+      renderFromJSON(storeData);
+
+      if (!storeData.profile || !storeData.profile.img) {
+        ImageStore.getImage('profile_img').then(idbImg => {
+          if (idbImg && (!storeData.profile || !storeData.profile.img)) {
+            const imgEl = document.getElementById('profile-img-element');
+            if (imgEl) {
+              imgEl.src = idbImg;
+              imgEl.setAttribute('src', idbImg);
+            }
+          }
+        });
+      }
+      if (getAdminState()) enterAdminMode();
+      else exitAdminMode();
+    }
+
+    function initApp() {
+      loadFromLocalStorage();
+      if (isFirebaseActive && db) {
+        db.ref('live_profile_json_v3').on('value', snapshot => {
+          const activeEl = document.activeElement;
+          const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable);
+          if (isFirebaseSaving || isUserTyping) return;
+
+          const data = snapshot.val();
+          if (data) {
+            if (data.admin_pw) {
+              cloudAdminPw = data.admin_pw;
+              try { localStorage.setItem('admin_pw', data.admin_pw); } catch(e) {}
+            }
+            if (data.storeData) {
+              storeData = data.storeData;
+              if (!storeData.gameBio || getCleanPlainText(storeData.gameBio).length === 0) {
+                storeData.gameBio = DEFAULT_GAME_BIO;
+              }
+              renderFromJSON(storeData);
+            }
+            if (data.cal_events) {
+              try { calendarEvents = JSON.parse(data.cal_events); } catch(e){}
+              renderCalendar();
+            }
+          }
+          if (getAdminState()) enterAdminMode();
+          else exitAdminMode();
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+    else initApp();
+  </script>
+</body>
+</html>
