@@ -376,7 +376,7 @@
     .video-edit-box { display: none !important; }
     body.admin-mode .video-edit-box { display: flex !important; flex-direction: column; gap: 8px; margin-top: 14px; width: 100%; }
 
-    /* 📅 월간 달력 최적화 */
+    /* ==================== 📅 월간 달력 레이아웃 & 스크롤 최적화 ==================== */
     .calendar-container { 
       width: 100%; 
       overflow-x: hidden; 
@@ -388,7 +388,13 @@
     .cal-nav-btn { background: #ffe4e8; border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
     .cal-nav-btn:hover { background: var(--card-border); }
 
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; }
+    /* minmax(0, 1fr)로 내용 길이에 상관없이 요일별 열 너비를 균등 고정 */
+    .calendar-grid { 
+      display: grid; 
+      grid-template-columns: repeat(7, minmax(0, 1fr)); 
+      gap: 8px; 
+      width: 100%; 
+    }
     .cal-day-name { font-size: 0.95rem; font-weight: 800; color: var(--accent-color); padding-bottom: 6px; text-align: center; }
     .cal-cell { 
       background: #fff8f9; 
@@ -403,6 +409,7 @@
       overflow-y: auto; 
       overscroll-behavior: auto; 
       touch-action: pan-y;
+      min-width: 0;
       -webkit-overflow-scrolling: touch; 
     }
     .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; }
@@ -412,10 +419,10 @@
     .cal-num { font-weight: 900; font-size: 0.95rem; color: var(--text-color); }
     .cal-add-evt-btn { background: var(--card-border); border: none; color: var(--accent-color); width: 22px; height: 22px; border-radius: 50%; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
 
-    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: #ffffff; color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid #ffd1dc; width: 100%; position: relative; box-shadow: 0 2px 4px rgba(255, 133, 162, 0.08); cursor: pointer; transition: transform 0.15s; }
+    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; }
+    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: #ffffff; color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid #ffd1dc; width: 100%; position: relative; box-shadow: 0 2px 4px rgba(255, 133, 162, 0.08); cursor: pointer; transition: transform 0.15s; min-width: 0; }
     .cal-event-item:hover { transform: scale(1.01); background: #fff0f3; }
-    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; }
+    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; min-width: 0; }
     .cal-event-time { 
       font-size: 0.68rem; 
       font-weight: 800; 
@@ -432,33 +439,88 @@
       text-overflow: ellipsis; 
     }
     .cal-event-time:empty:not([contenteditable="true"]) { display: none; }
-    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; }
+    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; min-width: 0; }
     .cal-event-del { border: none; background: transparent; color: #ffb6c1; font-size: 0.95rem; cursor: pointer; padding: 2px 4px; touch-action: manipulation; user-select: none; }
 
+    /* ==================== 📱 모바일 최적화 미디어 쿼리 ==================== */
     @media (max-width: 768px) {
       body { padding: 16px 6px 120px; }
-      .card { padding: 14px 12px; border-radius: 18px; }
+      .card { padding: 14px 10px; border-radius: 18px; }
       .sheet-tabs { padding: 4px; border-radius: 18px; gap: 4px; }
       .tab-btn { min-width: 62px; font-size: 0.74rem; padding: 8px 0; border-radius: 12px; }
       .calendar-header h2 { font-size: 1.2rem; }
       .cal-nav-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 12px; }
-      .calendar-grid { gap: 3px; }
-      .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
-      .cal-cell { 
-        min-height: 95px; 
-        height: auto; 
-        padding: 3px 2px; 
-        border-width: 1.5px; 
-        border-radius: 10px; 
-        overflow: visible !important; 
+
+      /* 모바일 달력 그리드 정밀 고정 */
+      .calendar-grid { 
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important; 
+        gap: 3px !important; 
+        width: 100% !important;
       }
-      .cal-num { font-size: 0.75rem; }
-      .cal-add-evt-btn { width: 20px; height: 22px; font-size: 0.8rem; }
-      .cal-event-item { padding: 4px 4px; border-radius: 6px; border-width: 1px; }
-      .cal-event-time { font-size: 0.62rem; padding: 1px 3px; border-radius: 3px; white-space: nowrap !important; word-break: normal !important; display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-      body:not(.admin-mode) .cal-event-text { font-size: 0.68rem; line-height: 1.2; min-height: 16px; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-break: normal !important; letter-spacing: -0.4px; }
-      body.admin-mode .cal-event-text { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-break: normal !important; }
-      .cal-event-del { font-size: 1.05rem; padding: 2px 6px; }
+      .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
+      
+      /* 날짜 박스 규격 통일 및 터치 시 부드러운 스크롤 */
+      .cal-cell { 
+        height: 96px !important; 
+        min-height: 96px !important; 
+        max-height: 96px !important; 
+        padding: 4px 2px !important; 
+        border-width: 1.5px !important; 
+        border-radius: 10px !important; 
+        min-width: 0 !important;
+        overflow: hidden !important; 
+        touch-action: pan-y !important;
+        gap: 2px !important;
+      }
+      .cal-cell.empty-cell { 
+        height: 96px !important; 
+        min-height: 96px !important; 
+        max-height: 96px !important; 
+        border: none !important; 
+        background: transparent !important; 
+        box-shadow: none !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        pointer-events: none !important; 
+      }
+      .cal-cell-header { margin-bottom: 1px !important; }
+      .cal-num { font-size: 0.75rem !important; }
+      .cal-add-evt-btn { width: 18px !important; height: 18px !important; font-size: 0.75rem !important; flex-shrink: 0 !important; }
+
+      .cal-event-list { gap: 2px !important; }
+      .cal-event-item { 
+        padding: 2px 3px !important; 
+        border-radius: 6px !important; 
+        border-width: 1px !important; 
+        min-width: 0 !important; 
+      }
+      .cal-event-top { gap: 1px !important; }
+      .cal-event-time { 
+        font-size: 0.58rem !important; 
+        padding: 1px 2px !important; 
+        border-radius: 3px !important; 
+        line-height: 1.1 !important;
+      }
+      body:not(.admin-mode) .cal-event-text { 
+        font-size: 0.62rem !important; 
+        line-height: 1.2 !important; 
+        min-height: auto !important; 
+        white-space: nowrap !important; 
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; 
+        word-break: normal !important; 
+        letter-spacing: -0.4px !important; 
+        display: block !important;
+        width: 100% !important;
+      }
+      body.admin-mode .cal-event-text { 
+        font-size: 0.62rem !important;
+        white-space: nowrap !important; 
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; 
+      }
+      .cal-event-del { font-size: 0.85rem !important; padding: 0 2px !important; line-height: 1 !important; }
+
       .url-input, .date-input, .time-text-input, .text-input, .select-input, .sch-ampm, .sch-time-val, #global-search-input { font-size: 16px !important; }
       .mc-tag-item { padding: 4px 10px; border-radius: 16px; }
       .mc-tag-text { font-size: 0.8rem; }
