@@ -388,7 +388,6 @@
     .cal-nav-btn { background: #ffe4e8; border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
     .cal-nav-btn:hover { background: var(--card-border); }
 
-    /* minmax(0, 1fr)로 내용 길이에 상관없이 요일별 열 너비를 균등 고정 */
     .calendar-grid { 
       display: grid; 
       grid-template-columns: repeat(7, minmax(0, 1fr)); 
@@ -410,9 +409,10 @@
       overscroll-behavior: auto; 
       touch-action: pan-y;
       min-width: 0;
+      cursor: pointer;
       -webkit-overflow-scrolling: touch; 
     }
-    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; }
+    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; cursor: default; }
     .cal-cell::-webkit-scrollbar { width: 3px; }
     .cal-cell::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
     .cal-cell-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2px; }
@@ -451,7 +451,6 @@
       .calendar-header h2 { font-size: 1.2rem; }
       .cal-nav-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 12px; }
 
-      /* 모바일 달력 그리드 정밀 고정 */
       .calendar-grid { 
         grid-template-columns: repeat(7, minmax(0, 1fr)) !important; 
         gap: 3px !important; 
@@ -459,7 +458,6 @@
       }
       .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
       
-      /* 날짜 박스 규격 통일 및 터치 시 부드러운 스크롤 */
       .cal-cell { 
         height: 96px !important; 
         min-height: 96px !important; 
@@ -764,12 +762,12 @@
     <button class="admin-only" onclick="manualSavePage()">💾 실시간 저장</button>
   </div>
 
-  <!-- 📅 모달: 일정 상세보기 -->
+  <!-- 📅 모달: 일정 상세보기 (단일 및 다중 일정 통합 출력) -->
   <div class="modal-overlay" id="event-detail-modal">
     <div class="modal-card">
       <h3 id="evt-detail-date">📅 일정 상세보기</h3>
       <p id="evt-detail-time" style="font-weight:800; color:var(--accent-color); margin-top:4px; margin-bottom:10px; font-size:0.9rem; display:none;"></p>
-      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:14px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; white-space:pre-wrap; word-break:break-all; margin-bottom:14px; max-height:280px; overflow-y:auto;"></div>
+      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:12px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; max-height:300px; overflow-y:auto;"></div>
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('event-detail-modal')">닫기</button></div>
     </div>
   </div>
@@ -943,7 +941,7 @@
     }
 
     function getCleanPlainText(str) {
-      if (!str) return '';
+      if (!str) return ''; 
       return String(str)
         .replace(/<[^>]*>/g, '')
         .replace(/&nbsp;/gi, '')
@@ -1077,8 +1075,8 @@
     }
 
     function openModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('active');
+      const modal = document.getElementById(id); 
+      if (modal) modal.classList.add('active'); 
       updateBodyScrollLock();
     }
 
@@ -1317,7 +1315,7 @@
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞𝐝𝐚𝐲]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢ｔ𝐞𝐝ａｙ]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -1900,7 +1898,8 @@
       if (tabId === 'monthly') renderCalendar();
     }
 
-    function openEventDetailModal(dateKey, time, text) {
+    /* 💡 수정 1-2: 해당 일자의 모든 일정을 한 번에 깔끔하게 보여주는 통합 팝업 */
+    function openDayEventsModal(dateKey) {
       const dateEl = document.getElementById('evt-detail-date');
       const timeEl = document.getElementById('evt-detail-time');
       const contentEl = document.getElementById('evt-detail-content');
@@ -1908,14 +1907,35 @@
       if (dateKey) {
         const parts = formatYMD(dateKey).split('-');
         dateEl.textContent = parts.length === 3 ? `📅 ${parts[0]}년 ${parts[1]}월 ${parts[2]}일 일정` : `📅 ${dateKey} 일정`;
-      } else { dateEl.textContent = `📅 일정 상세보기`; }
+      } else { 
+        dateEl.textContent = `📅 일정 상세보기`; 
+      }
 
-      if (time && time.trim()) {
-        timeEl.textContent = `⏰ 시간: ${time.trim()}`; timeEl.style.display = 'block';
-      } else { timeEl.textContent = ''; timeEl.style.display = 'none'; }
+      if (timeEl) timeEl.style.display = 'none';
 
-      contentEl.textContent = text || '내용이 없습니다.';
+      const evts = calendarEvents[dateKey] || [];
+      if (evts.length === 0) {
+        contentEl.innerHTML = '<div style="text-align:center; color:#8c6b73; padding:16px 0; font-weight:700;">등록된 일정이 없습니다.</div>';
+      } else {
+        contentEl.innerHTML = evts.map((evt, idx) => `
+          <div style="background:#ffffff; border:1.5px solid #ffe0e6; border-radius:12px; padding:10px 12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(255,133,162,0.06); text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.75rem; font-weight:800; color:var(--accent-color); background:#ffe4e8; padding:2px 8px; border-radius:6px;">
+                ${evt.time && evt.time.trim() ? '⏰ ' + escapeHtml(evt.time.trim()) : '📌 하루 종일'}
+              </span>
+              <span style="font-size:0.75rem; color:#b08d95; font-weight:800;">#${idx + 1}</span>
+            </div>
+            <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-all; line-height:1.4;">
+              ${escapeHtml(evt.text || '내용 없음')}
+            </div>
+          </div>
+        `).join('');
+      }
       openModal('event-detail-modal');
+    }
+
+    function openEventDetailModal(dateKey, time, text) {
+      openDayEventsModal(dateKey);
     }
 
     function renderPaginatedList(listId, paginationId, pageKey) {
@@ -2093,6 +2113,7 @@
       if (box) { box.classList.toggle('full-width'); triggerAutoSave(); }
     }
 
+    /* 💡 수정 1-1: 월간 달력 일정까지 포괄하는 통합 검색 */
     function handleGlobalSearch(query) {
       const dropdown = document.getElementById('search-results-dropdown');
       const clearBtn = document.getElementById('search-clear-btn');
@@ -2126,6 +2147,29 @@
         });
       });
 
+      /* 📅 월간 캘린더 일정 검색 */
+      if (calendarEvents && typeof calendarEvents === 'object') {
+        for (const [dateKey, evts] of Object.entries(calendarEvents)) {
+          if (Array.isArray(evts)) {
+            evts.forEach(evt => {
+              const timeText = evt.time ? evt.time.trim() : '';
+              const descText = evt.text ? evt.text.trim() : '';
+              const fullStr = `${dateKey} ${timeText} ${descText}`;
+              if (fullStr.toLowerCase().includes(keyword)) {
+                let clean = `[${dateKey}] ${timeText ? timeText + ' ' : ''}${descText}`.trim();
+                if (clean.length > 45) clean = clean.substring(0, 45) + '...';
+                results.push({
+                  text: clean,
+                  tabName: 'monthly',
+                  badge: '📅 월간 일정',
+                  dateKey: dateKey
+                });
+              }
+            });
+          }
+        }
+      }
+
       if (results.length === 0) {
         dropdown.innerHTML = '<div style="padding:12px; font-size:0.85rem; font-weight:700; text-align:center;">🔍 검색 결과가 없습니다.</div>';
       } else {
@@ -2133,11 +2177,41 @@
           const div = document.createElement('div');
           div.className = 'search-result-item';
           div.innerHTML = `<span class="search-result-text">${escapeHtml(res.text)}</span><span class="search-result-badge">${res.badge}</span>`;
-          div.onclick = function() { jumpToSearchResult(res.tabName, res.elementId); };
+          div.onclick = function() { 
+            if (res.tabName === 'monthly') {
+              jumpToCalendarDate(res.dateKey);
+            } else {
+              jumpToSearchResult(res.tabName, res.elementId); 
+            }
+          };
           dropdown.appendChild(div);
         });
       }
       dropdown.style.display = 'flex';
+    }
+
+    /* 📅 검색된 달력 날짜로 정확히 이동 후 팝업 호출 */
+    function jumpToCalendarDate(dateKey) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+
+      const parts = dateKey.split('-');
+      if (parts.length === 3) {
+        currentYear = parseInt(parts[0], 10);
+        currentMonth = parseInt(parts[1], 10) - 1;
+      }
+      switchTab(null, 'monthly');
+      renderCalendar();
+
+      setTimeout(() => {
+        const targetCell = document.getElementById(`cal-cell-${dateKey}`);
+        if (targetCell) {
+          targetCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCell.classList.add('search-highlight');
+          setTimeout(() => targetCell.classList.remove('search-highlight'), 2400);
+        }
+        openDayEventsModal(dateKey);
+      }, 150);
     }
 
     function jumpToSearchResult(tabName, elementId) {
@@ -2306,21 +2380,48 @@
       }
       const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
       for (let date = 1; date <= lastDate; date++) {
-        const cell = document.createElement('div'); cell.className = 'cal-cell';
+        const cell = document.createElement('div'); 
+        cell.className = 'cal-cell';
         const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
+        cell.id = `cal-cell-${dateKey}`;
+        
+        /* 💡 칸 터치 시 해당 날짜의 전체 일정을 팝업으로 표시 */
+        cell.onclick = function(e) {
+          if (!document.body.classList.contains('admin-mode') && !e.target.closest('.cal-add-evt-btn') && !e.target.closest('.cal-event-del')) {
+            openDayEventsModal(dateKey);
+          }
+        };
+
         const cellHeader = document.createElement('div'); cellHeader.className = 'cal-cell-header';
+        
+        const numWrap = document.createElement('div');
+        numWrap.style.cssText = 'display:flex; align-items:center; gap:4px;';
         const num = document.createElement('span'); num.className = 'cal-num'; num.textContent = date;
-        cellHeader.appendChild(num);
+        numWrap.appendChild(num);
+
+        let events = calendarEvents[dateKey] || [];
+        if (events.length >= 3) {
+          const countBadge = document.createElement('span');
+          countBadge.style.cssText = 'font-size:0.58rem; font-weight:800; color:var(--accent-color); background:#ffe4e8; padding:1px 4px; border-radius:6px; line-height:1;';
+          countBadge.textContent = `${events.length}`;
+          numWrap.appendChild(countBadge);
+        }
+        cellHeader.appendChild(numWrap);
+
         if (isAdmin) {
           const addEvtBtn = document.createElement('button'); addEvtBtn.className = 'cal-add-evt-btn'; addEvtBtn.textContent = '+';
-          addEvtBtn.onclick = function() { addCalendarEventItem(dateKey, '', ''); };
+          addEvtBtn.onclick = function(e) { 
+            e.stopPropagation(); 
+            addCalendarEventItem(dateKey, '', ''); 
+          };
           cellHeader.appendChild(addEvtBtn);
         }
         cell.appendChild(cellHeader);
+
         const evtList = document.createElement('div'); evtList.className = 'cal-event-list'; evtList.id = `cal-evt-list-${dateKey}`;
-        let events = calendarEvents[dateKey] || [];
         events.forEach(evtObj => renderEventItem(evtList, dateKey, evtObj.time || '', evtObj.text || '', isAdmin));
-        cell.appendChild(evtList); calBody.appendChild(cell);
+        cell.appendChild(evtList); 
+        calBody.appendChild(cell);
       }
     }
 
@@ -2330,7 +2431,8 @@
       item.style.cursor = 'pointer';
       item.onclick = function(e) {
         if (!document.body.classList.contains('admin-mode')) {
-          openEventDetailModal(dateKey, time, text);
+          e.stopPropagation();
+          openDayEventsModal(dateKey);
         }
       };
 
@@ -2384,11 +2486,14 @@
       });
     }
 
+    /* 💡 수정 1-3: 월 이동 시 달력 변경사항 실시간 자동 저장 */
     function moveMonth(delta) {
-      saveCalendarEventsFromDOM(); currentMonth += delta;
+      saveCalendarEventsFromDOM(); 
+      currentMonth += delta;
       if (currentMonth < 0) { currentMonth = 11; currentYear--; }
       else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
       renderCalendar();
+      triggerAutoSave();
     }
 
     function manualSavePage() { savePage(false); }
@@ -2448,15 +2553,16 @@
       list.appendChild(div); setEditable(true); triggerAutoSave();
     }
 
+    /* 💡 수정 1-4: 업적 추가 시 표준 8자리 날짜 형식(YYYYMMDD)으로 일치 */
     function addAchievementItem() {
       const list = document.getElementById('achievement-list');
       if (!list) return;
       const today = new Date();
-      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
       const div = document.createElement('div');
       div.className = 'item-row achievement-item';
       div.innerHTML = `
-        <span class="anniv-date" contenteditable="true">${todayYm}</span>
+        <span class="anniv-date" contenteditable="true">${todayYmd8}</span>
         <span class="info-text" contenteditable="true">달성했던 방송 업적 및 기록 기재</span>
         <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
         <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
@@ -2724,10 +2830,10 @@
       const lines = rawText.split('\n');
       const today = new Date();
       const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
       if (currentBulkPasteTarget === 'achievements') {
-        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYm, line.trim()]); });
+        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYmd8, line.trim()]); });
       } else if (currentBulkPasteTarget === 'games') {
         lines.forEach(line => { if (line.trim()) storeData.games.push([line.trim(), "⭐⭐⭐⭐⭐⭐", todayFormatted, "후기 기재"]); });
       } else if (currentBulkPasteTarget === 'tmi') {
