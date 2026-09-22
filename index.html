@@ -19,6 +19,22 @@
       --text-color: #5c3a42;
       --card-border: #ffccd5;
       --tab-text-color: #ff758c;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --item-bg: #fff8f9;
+      --item-border: #ffe0e6;
+    }
+
+    /* 🌙 다크모드 색상 변환 */
+    body.dark-mode {
+      --bg-color: #1a1215;
+      --grid-color: #2c1a20;
+      --accent-color: #ff6b8b;
+      --text-color: #f7e1e6;
+      --card-border: #4a3038;
+      --tab-text-color: #ff94a8;
+      --card-bg: rgba(36, 25, 29, 0.95);
+      --item-bg: #2d1d22;
+      --item-border: #422a32;
     }
 
     * {
@@ -43,6 +59,7 @@
       min-height: 100vh;
       opacity: 1;
       position: relative;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 */
@@ -95,17 +112,21 @@
       max-width: 720px;
       margin: 0 auto;
       position: relative;
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .search-input-wrapper {
       display: flex;
       align-items: center;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 3px solid var(--card-border);
       border-radius: 24px;
       padding: 6px 16px;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
       gap: 10px;
+      flex: 1;
     }
 
     .search-input-wrapper input {
@@ -117,6 +138,27 @@
       color: var(--text-color);
       background: transparent;
     }
+
+    .search-input-wrapper input::placeholder {
+      color: var(--tab-text-color);
+      opacity: 0.7;
+    }
+
+    /* 🌙 다크모드 토글 버튼 */
+    .dark-mode-btn {
+      background: var(--card-bg);
+      border: 3px solid var(--card-border);
+      color: var(--accent-color);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 10px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      white-space: nowrap;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .dark-mode-btn:hover { transform: scale(1.05); background: var(--item-bg); }
 
     .search-clear-btn {
       background: transparent;
@@ -133,7 +175,7 @@
       top: 100%;
       left: 0;
       width: 100%;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 3px solid var(--card-border);
       border-radius: 20px;
       margin-top: 8px;
@@ -152,8 +194,8 @@
     .search-result-item {
       padding: 10px 14px;
       border-radius: 12px;
-      background: #fff8f9;
-      border: 1.5px solid #ffe0e6;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
       cursor: pointer;
       display: flex;
       justify-content: space-between;
@@ -162,7 +204,7 @@
       transition: background 0.2s;
     }
 
-    .search-result-item:hover { background: #ffe8ec; }
+    .search-result-item:hover { opacity: 0.85; }
     .search-result-text { font-size: 0.88rem; font-weight: 700; color: var(--text-color); word-break: break-all; }
     .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; background: var(--accent-color); color: #ffffff; white-space: nowrap; }
 
@@ -183,7 +225,7 @@
     }
 
     .page-btn {
-      background: #ffe4e8;
+      background: var(--item-bg);
       border: 1.5px solid var(--card-border);
       color: var(--accent-color);
       font-size: 0.82rem;
@@ -207,7 +249,7 @@
 
     .sheet-tabs {
       display: flex;
-      background: #ffffff;
+      background: var(--card-bg);
       padding: 6px;
       border-radius: 24px;
       border: 3px solid var(--card-border);
@@ -264,7 +306,7 @@
     .main-col-left, .main-col-right { display: flex; flex-direction: column; gap: 18px; }
 
     .card {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--card-bg);
       border-radius: 24px;
       padding: 24px;
       border: 3px solid var(--card-border);
@@ -273,6 +315,7 @@
       width: 100%;
       max-width: 100%;
       overflow: hidden;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     body.admin-mode [contenteditable="true"] {
@@ -282,8 +325,8 @@
       display: inline-block;
       border-radius: 6px;
     }
-    body.admin-mode [contenteditable="true"]:hover { background: #ffe4e8; cursor: text; }
-    body.admin-mode [contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background: #ffffff; }
+    body.admin-mode [contenteditable="true"]:hover { background: var(--item-bg); cursor: text; }
+    body.admin-mode [contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background: var(--card-bg); }
 
     [contenteditable="true"] a, .info-text a, .profile-bio a, .game-review-text a, .tmi-content-text a {
       color: var(--accent-color);
@@ -293,7 +336,7 @@
 
     .profile { text-align: center; }
     .profile-img-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto 16px; }
-    .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff0f5; border: 4px solid var(--card-border); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); display: block; }
+    .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: var(--item-bg); border: 4px solid var(--card-border); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); display: block; }
     .img-upload-btn { position: absolute; bottom: 0; right: -4px; background: var(--accent-color); color: #ffffff; font-size: 0.72rem; padding: 5px 10px; border-radius: 14px; cursor: pointer; font-weight: 700; user-select: none; }
     .profile h1 { font-size: 1.45rem; font-weight: 800; color: var(--accent-color); margin-bottom: 6px; word-break: break-all; }
     .profile-bio { font-size: 0.92rem; color: var(--text-color); line-height: 1.6; text-align: center; min-height: 30px; white-space: pre-wrap; word-break: break-all; width: 100%; margin-bottom: 16px; }
@@ -313,8 +356,8 @@
     }
 
     .info-box-item {
-      background: #fff8f9;
-      border: 1.5px solid #ffe0e6;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
       border-radius: 16px;
       padding: 10px 12px;
       display: flex;
@@ -326,7 +369,7 @@
       flex-wrap: wrap;
     }
     .info-box-item.full-width { grid-column: span 2; }
-    .info-box-label { font-size: 0.78rem; font-weight: 800; color: var(--accent-color); background: #ffe4e8; padding: 4px 10px; border-radius: 12px; white-space: nowrap; outline: none; flex: 0 0 auto; }
+    .info-box-label { font-size: 0.78rem; font-weight: 800; color: var(--accent-color); background: var(--card-bg); padding: 4px 10px; border-radius: 12px; white-space: nowrap; outline: none; flex: 0 0 auto; border: 1px solid var(--item-border); }
     .info-box-val { font-size: 0.85rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
 
     #first-stream-text { white-space: nowrap !important; flex-shrink: 0 !important; }
@@ -342,7 +385,7 @@
 
     .card-move-btns { display: flex; gap: 4px; align-items: center; }
     .move-btn, .resize-btn {
-      background: #ffe4e8;
+      background: var(--item-bg);
       border: 1px solid var(--card-border);
       color: var(--accent-color);
       font-size: 0.75rem;
@@ -354,26 +397,26 @@
       user-select: none;
     }
     .move-btn:hover, .resize-btn:hover { background: var(--card-border); }
-    .add-btn { background: #ffe4e8; border: none; color: var(--accent-color); padding: 5px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
+    .add-btn { background: var(--item-bg); border: 1px solid var(--item-border); color: var(--accent-color); padding: 5px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
     .add-btn:hover { background: var(--card-border); }
 
     .list-wrapper { display: flex; flex-direction: column; gap: 10px; }
-    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff8f9; border-radius: 16px; border: 1.5px solid #ffe0e6; gap: 10px; min-width: 0; }
+    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--item-bg); border-radius: 16px; border: 1.5px solid var(--item-border); gap: 10px; min-width: 0; }
     .del-btn { background: transparent; border: none; color: #ffb6c1; font-size: 1.1rem; cursor: pointer; padding: 0 4px; font-weight: bold; touch-action: manipulation; user-select: none; }
     .del-btn:hover { color: var(--accent-color); }
 
     body.admin-mode .link-anchor, body.admin-mode .schedule-view-box { display: none !important; }
 
     .link-anchor { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; width: 100%; text-decoration: none; color: var(--accent-color); font-weight: 700; font-size: 0.92rem; cursor: pointer; min-width: 0; }
-    .link-anchor:hover { background: #ffe8ec; }
+    .link-anchor:hover { background: var(--item-bg); }
     .link-name { min-width: 0; word-break: break-all; }
 
     .link-edit-box { width: 100%; padding: 4px 0; display: flex; flex-direction: column; gap: 6px; }
-    .url-input, .date-input, .time-text-input, .text-input { width: 100%; padding: 7px 10px; font-size: 0.85rem; border: 1.5px solid var(--card-border); border-radius: 10px; color: var(--text-color); background: #ffffff; }
+    .url-input, .date-input, .time-text-input, .text-input { width: 100%; padding: 7px 10px; font-size: 0.85rem; border: 1.5px solid var(--card-border); border-radius: 10px; color: var(--text-color); background: var(--card-bg); }
     .anniv-date-picker { width: 120px !important; flex-shrink: 0 !important; }
     .time-text-input { width: 80px; padding: 6px 8px; font-size: 0.82rem; font-weight: 700; text-align: center; }
 
-    .select-input { padding: 6px 10px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid var(--card-border); border-radius: 12px; color: var(--accent-color); background: #ffffff; cursor: pointer; outline: none; }
+    .select-input { padding: 6px 10px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid var(--card-border); border-radius: 12px; color: var(--accent-color); background: var(--card-bg); cursor: pointer; outline: none; }
 
     body:not(.admin-mode) .game-rating-select {
       pointer-events: none;
@@ -404,7 +447,7 @@
     .sch-time-val { width: 58px !important; padding: 4px 3px !important; font-size: 0.78rem !important; border-radius: 8px !important; flex-shrink: 0 !important; }
 
     .mc-server-flex-container { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: #ffe4e8; border: 1.5px solid var(--card-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(255, 133, 162, 0.08); max-width: 100%; }
+    .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: var(--item-bg); border: 1.5px solid var(--item-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); max-width: 100%; }
     .mc-tag-text { font-weight: 800; color: var(--accent-color); font-size: 0.88rem; word-break: break-all; }
 
     .video-edit-box { display: none !important; }
@@ -419,7 +462,7 @@
     }
     .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
     .calendar-header h2 { font-size: 1.5rem; color: var(--accent-color); font-weight: 900; letter-spacing: -0.5px; }
-    .cal-nav-btn { background: #ffe4e8; border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
+    .cal-nav-btn { background: var(--item-bg); border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
     .cal-nav-btn:hover { background: var(--card-border); }
 
     .calendar-grid { 
@@ -430,8 +473,8 @@
     }
     .cal-day-name { font-size: 0.95rem; font-weight: 800; color: var(--accent-color); padding-bottom: 6px; text-align: center; }
     .cal-cell { 
-      background: #fff8f9; 
-      border: 2px solid #ffe0e6; 
+      background: var(--item-bg); 
+      border: 2px solid var(--item-border); 
       border-radius: 16px; 
       height: 150px; 
       padding: 8px; 
@@ -454,15 +497,15 @@
     .cal-add-evt-btn { background: var(--card-border); border: none; color: var(--accent-color); width: 22px; height: 22px; border-radius: 50%; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
 
     .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; }
-    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: #ffffff; color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid #ffd1dc; width: 100%; position: relative; box-shadow: 0 2px 4px rgba(255, 133, 162, 0.08); cursor: pointer; transition: transform 0.15s; min-width: 0; }
-    .cal-event-item:hover { transform: scale(1.01); background: #fff0f3; }
+    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: var(--card-bg); color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid var(--item-border); width: 100%; position: relative; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); cursor: pointer; transition: transform 0.15s; min-width: 0; }
+    .cal-event-item:hover { transform: scale(1.01); opacity: 0.9; }
     .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; min-width: 0; }
     .cal-event-time { 
       font-size: 0.68rem; 
       font-weight: 800; 
       color: var(--accent-color); 
       outline: none; 
-      background: #ffe4e8; 
+      background: var(--item-bg); 
       padding: 1px 4px; 
       border-radius: 4px; 
       white-space: nowrap !important; 
@@ -561,7 +604,7 @@
       .admin-status { font-size: 0.75rem; }
     }
 
-    .game-card-item { background: #fff8f9; border: 1.5px solid #ffe0e6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .game-card-item { background: var(--item-bg); border: 1.5px solid var(--item-border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
     .game-title, .game-review-text, .tmi-content-text, .info-text { word-break: break-all; overflow-wrap: break-word; min-width: 0; }
     .admin-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4a2830; padding: 10px 22px; border-radius: 30px; display: flex; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0, 0.3); z-index: 1000; align-items: center; }
     .admin-bar button { background: transparent; border: none; color: #ffffff; font-weight: 700; font-size: 0.88rem; cursor: pointer; touch-action: manipulation; user-select: none; }
@@ -570,11 +613,11 @@
 
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 40, 48, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 2000; }
     .modal-overlay.active { display: flex !important; }
-    .modal-card { background: #ffffff; padding: 24px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 3px solid var(--card-border); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .modal-card { background: var(--card-bg); padding: 24px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 3px solid var(--card-border); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
     .modal-card h3 { font-size: 1.1rem; color: var(--accent-color); margin-bottom: 8px; font-weight: 800; }
     .modal-card p { font-size: 0.85rem; color: var(--text-color); margin-bottom: 16px; }
-    .modal-card input[type="password"] { width: 100%; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; text-align: center; }
-    .modal-card textarea { width: 100%; height: 160px; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 12px; font-size: 0.85rem; resize: none; margin-bottom: 8px; color: var(--text-color); outline: none; }
+    .modal-card input[type="password"] { width: 100%; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; text-align: center; background: var(--card-bg); color: var(--text-color); }
+    .modal-card textarea { width: 100%; height: 160px; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 12px; font-size: 0.85rem; resize: none; margin-bottom: 8px; color: var(--text-color); background: var(--card-bg); outline: none; }
 
     .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; font-size: 0.88rem; color: var(--text-color); }
     .color-picker-row input[type="color"] { border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; background: transparent; }
@@ -582,7 +625,7 @@
     .modal-btns { display: flex; gap: 8px; margin-top: 12px; }
     .modal-btns button { flex: 1; padding: 9px 0; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
     .btn-submit { background: var(--accent-color); color: white; }
-    .btn-cancel { background: #ffe4e8; color: var(--text-color); }
+    .btn-cancel { background: var(--item-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .error-msg { color: #ef4444; font-size: 0.78rem; margin-top: 8px; display: none; }
 
     #game-bio {
@@ -604,19 +647,20 @@
 <body>
 
   <!-- 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 -->
-  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('안녕 난 초핸썸몸짱신사메럿이야')">
+  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('초섹시핫바디귀요미핑크공주 메루의 단짝 메럿입니다 🐾')">
     <img src="mascot.png" id="merot-mascot-img" alt="메럿" onerror="this.src='https://api.iconify.design/fluent-emoji:bear.svg'">
   </div>
 
   <div class="container">
 
-    <!-- 🔍 실시간 통합 검색바 -->
+    <!-- 🔍 실시간 통합 검색바 + 다크모드 버튼 -->
     <div class="search-container">
       <div class="search-input-wrapper">
         <span style="font-size: 1rem;">🔍</span>
         <input type="text" id="global-search-input" placeholder="프로필, 일정, 게임, 업적, TMI 검색..." oninput="handleGlobalSearch(this.value)">
         <button class="search-clear-btn" id="search-clear-btn" onclick="clearGlobalSearch()">×</button>
       </div>
+      <button class="dark-mode-btn" id="dark-mode-toggle-btn" onclick="toggleDarkMode()">🌙 다크</button>
       <div class="search-results-dropdown" id="search-results-dropdown"></div>
     </div>
 
@@ -720,13 +764,13 @@
           <button class="cal-nav-btn" onclick="moveMonth(1)">&gt;</button>
         </div>
         <div class="calendar-grid">
-          <div class="cal-day-name" style="color:#ff4d73;">일</div>
+          <div class="cal-day-name" style="color:var(--accent-color);">일</div>
           <div class="cal-day-name">월</div>
           <div class="cal-day-name">화</div>
           <div class="cal-day-name">수</div>
           <div class="cal-day-name">목</div>
           <div class="cal-day-name">금</div>
-          <div class="cal-day-name" style="color:#ff6b8b;">토</div>
+          <div class="cal-day-name" style="color:var(--accent-color);">토</div>
         </div>
         <div class="calendar-grid" id="calendar-body"></div>
       </div>
@@ -801,12 +845,12 @@
     <button class="admin-only" onclick="manualSavePage()">💾 실시간 저장</button>
   </div>
 
-  <!-- 📅 모달: 일정 상세보기 (단일 및 다중 일정 통합 출력) -->
+  <!-- 📅 모달: 일정 상세보기 -->
   <div class="modal-overlay" id="event-detail-modal">
     <div class="modal-card">
       <h3 id="evt-detail-date">📅 일정 상세보기</h3>
       <p id="evt-detail-time" style="font-weight:800; color:var(--accent-color); margin-top:4px; margin-bottom:10px; font-size:0.9rem; display:none;"></p>
-      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:12px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; max-height:300px; overflow-y:auto;"></div>
+      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:var(--item-bg); padding:12px; border-radius:14px; border:1.5px solid var(--item-border); text-align:left; max-height:300px; overflow-y:auto;"></div>
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('event-detail-modal')">닫기</button></div>
     </div>
   </div>
@@ -873,6 +917,25 @@
       console.warn("방어된 스크립트 예외:", msg, "line:", line);
       return true;
     };
+
+    /* 🌙 다크모드 토글 및 유지 관리자 */
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      try { localStorage.setItem('is_dark_mode', isDark ? 'true' : 'false'); } catch(e) {}
+      const btn = document.getElementById('dark-mode-toggle-btn');
+      if (btn) btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
+    }
+
+    function initDarkMode() {
+      try {
+        if (localStorage.getItem('is_dark_mode') === 'true') {
+          document.body.classList.add('dark-mode');
+          const btn = document.getElementById('dark-mode-toggle-btn');
+          if (btn) btn.textContent = '☀️ 라이트';
+        }
+      } catch(e) {}
+    }
 
     /* 💡 관리자 세션 상태 안전 관리자 (Fail-Safe Storage) */
     function getAdminState() {
@@ -1814,7 +1877,7 @@
             </div>
             <div>
               <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
-              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6; white-space:pre-wrap;">${escapeHtml(item[3])}</div>
+              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border); white-space:pre-wrap;">${escapeHtml(item[3])}</div>
             </div>
             <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
               <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
@@ -1956,12 +2019,12 @@
         contentEl.innerHTML = '<div style="text-align:center; color:#8c6b73; padding:16px 0; font-weight:700;">등록된 일정이 없습니다.</div>';
       } else {
         contentEl.innerHTML = evts.map((evt, idx) => `
-          <div style="background:#ffffff; border:1.5px solid #ffe0e6; border-radius:12px; padding:10px 12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(255,133,162,0.06); text-align:left;">
+          <div style="background:var(--card-bg); border:1.5px solid var(--item-border); border-radius:12px; padding:10px 12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.06); text-align:left;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <span style="font-size:0.75rem; font-weight:800; color:var(--accent-color); background:#ffe4e8; padding:2px 8px; border-radius:6px;">
+              <span style="font-size:0.75rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:2px 8px; border-radius:6px;">
                 ${evt.time && evt.time.trim() ? '⏰ ' + escapeHtml(evt.time.trim()) : '📌 하루 종일'}
               </span>
-              <span style="font-size:0.75rem; color:#b08d95; font-weight:800;">#${idx + 1}</span>
+              <span style="font-size:0.75rem; color:var(--tab-text-color); font-weight:800;">#${idx + 1}</span>
             </div>
             <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-all; line-height:1.4;">
               ${escapeHtml(evt.text || '내용 없음')}
@@ -2436,7 +2499,7 @@
         let events = calendarEvents[dateKey] || [];
         if (events.length >= 3) {
           const countBadge = document.createElement('span');
-          countBadge.style.cssText = 'font-size:0.58rem; font-weight:800; color:var(--accent-color); background:#ffe4e8; padding:1px 4px; border-radius:6px; line-height:1;';
+          countBadge.style.cssText = 'font-size:0.58rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:1px 4px; border-radius:6px; line-height:1; border:1px solid var(--item-border);';
           countBadge.textContent = `${events.length}`;
           numWrap.appendChild(countBadge);
         }
@@ -2498,7 +2561,8 @@
       if (eventText === null) return;
       if (!calendarEvents[dateKey]) calendarEvents[dateKey] = [];
       calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
-      renderCalendar(); saveCalendarEventsFromDOM(); triggerAutoSave();
+      renderCalendar(); 
+      triggerAutoSave();
     }
 
     function saveCalendarEventsFromDOM() {
@@ -2637,7 +2701,7 @@
           <span contenteditable="true" class="game-date-text" style="font-size:0.85rem; font-weight:700;">${todayFormatted}</span>
         </div>
         <div>
-          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6;">게임 후기를 작성하세요.</div>
+          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border);">게임 후기를 작성하세요.</div>
         </div>
         <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
           <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
@@ -2908,6 +2972,7 @@
     }
 
     function initApp() {
+      initDarkMode();
       loadFromLocalStorage();
       if (isFirebaseActive && db) {
         db.ref('live_profile_json_v3').on('value', snapshot => {
