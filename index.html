@@ -42,6 +42,38 @@
       padding: 40px 16px 120px;
       min-height: 100vh;
       opacity: 1;
+      position: relative;
+    }
+
+    /* 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 */
+    .floating-merot-mascot {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 105px;
+      z-index: 990;
+      pointer-events: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 18px rgba(255, 77, 115, 0.3));
+      animation: merotFloating 3.6s ease-in-out infinite;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .floating-merot-mascot:hover {
+      transform: scale(1.15) rotate(-6deg);
+    }
+    .floating-merot-mascot img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes merotFloating {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-9px) rotate(3deg); }
+    }
+
+    @media (max-width: 768px) {
+      .floating-merot-mascot { width: 75px; bottom: 85px; right: 14px; }
     }
 
     body.modal-open {
@@ -54,6 +86,8 @@
       display: flex;
       flex-direction: column;
       gap: 18px;
+      position: relative;
+      z-index: 1;
     }
 
     .search-container {
@@ -407,9 +441,9 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); 
       overflow-y: auto; 
       overscroll-behavior: auto; 
-      touch-action: pan-y;
-      min-width: 0;
-      cursor: pointer;
+      touch-action: pan-y; 
+      min-width: 0; 
+      cursor: pointer; 
       -webkit-overflow-scrolling: touch; 
     }
     .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; cursor: default; }
@@ -568,6 +602,11 @@
   </style>
 </head>
 <body>
+
+  <!-- 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 -->
+  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('초섹시핫바디귀요미핑크공주 메루의 단짝 메럿입니다 🐾')">
+    <img src="mascot.png" id="merot-mascot-img" alt="메럿" onerror="this.src='https://api.iconify.design/fluent-emoji:bear.svg'">
+  </div>
 
   <div class="container">
 
@@ -1898,7 +1937,6 @@
       if (tabId === 'monthly') renderCalendar();
     }
 
-    /* 💡 수정 1-2: 해당 일자의 모든 일정을 한 번에 깔끔하게 보여주는 통합 팝업 */
     function openDayEventsModal(dateKey) {
       const dateEl = document.getElementById('evt-detail-date');
       const timeEl = document.getElementById('evt-detail-time');
@@ -2103,7 +2141,7 @@
     function moveCardDown(btn) {
       const card = btn.closest('.main-card-item');
       if (card && card.nextElementSibling && card.nextElementSibling.classList.contains('main-card-item')) {
-        card.parentElement.insertBefore(card, card.nextElementSibling);
+        card.parentElement.insertBefore(card.nextElementSibling, card);
         triggerAutoSave();
       }
     }
@@ -2113,7 +2151,6 @@
       if (box) { box.classList.toggle('full-width'); triggerAutoSave(); }
     }
 
-    /* 💡 수정 1-1: 월간 달력 일정까지 포괄하는 통합 검색 */
     function handleGlobalSearch(query) {
       const dropdown = document.getElementById('search-results-dropdown');
       const clearBtn = document.getElementById('search-clear-btn');
@@ -2147,7 +2184,6 @@
         });
       });
 
-      /* 📅 월간 캘린더 일정 검색 */
       if (calendarEvents && typeof calendarEvents === 'object') {
         for (const [dateKey, evts] of Object.entries(calendarEvents)) {
           if (Array.isArray(evts)) {
@@ -2190,7 +2226,6 @@
       dropdown.style.display = 'flex';
     }
 
-    /* 📅 검색된 달력 날짜로 정확히 이동 후 팝업 호출 */
     function jumpToCalendarDate(dateKey) {
       const dropdown = document.getElementById('search-results-dropdown');
       if (dropdown) dropdown.style.display = 'none';
@@ -2385,7 +2420,6 @@
         const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
         cell.id = `cal-cell-${dateKey}`;
         
-        /* 💡 칸 터치 시 해당 날짜의 전체 일정을 팝업으로 표시 */
         cell.onclick = function(e) {
           if (!document.body.classList.contains('admin-mode') && !e.target.closest('.cal-add-evt-btn') && !e.target.closest('.cal-event-del')) {
             openDayEventsModal(dateKey);
@@ -2486,7 +2520,6 @@
       });
     }
 
-    /* 💡 수정 1-3: 월 이동 시 달력 변경사항 실시간 자동 저장 */
     function moveMonth(delta) {
       saveCalendarEventsFromDOM(); 
       currentMonth += delta;
@@ -2553,7 +2586,6 @@
       list.appendChild(div); setEditable(true); triggerAutoSave();
     }
 
-    /* 💡 수정 1-4: 업적 추가 시 표준 8자리 날짜 형식(YYYYMMDD)으로 일치 */
     function addAchievementItem() {
       const list = document.getElementById('achievement-list');
       if (!list) return;
