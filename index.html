@@ -647,7 +647,7 @@
 <body>
 
   <!-- 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 -->
-  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('안녕 난 초핸썸몸짱신사메럿이야')">
+  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('초섹시핫바디귀요미핑크공주 메루의 단짝 메럿입니다 🐾')">
     <img src="mascot.png" id="merot-mascot-img" alt="메럿" onerror="this.src='https://api.iconify.design/fluent-emoji:bear.svg'">
   </div>
 
@@ -902,7 +902,7 @@
   <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
   <div class="modal-overlay" id="bulk-paste-modal">
     <div class="modal-card">
-      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
+      <h3>📋 여러 줄 한 번에 붙여넣기</h3>
       <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
       <div class="modal-btns">
         <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
@@ -2520,6 +2520,9 @@
         cell.appendChild(evtList); 
         calBody.appendChild(cell);
       }
+      
+      // 월간 일정이 바뀔 때 주간 일정 자동 동기화 갱신
+      syncWeeklyScheduleFromCalendar();
     }
 
     function renderEventItem(container, dateKey, time, text, isAdmin) {
@@ -2541,7 +2544,7 @@
 
       if (isAdmin) {
         const delBtn = document.createElement('button'); delBtn.className = 'cal-event-del'; delBtn.innerHTML = '×';
-        delBtn.onclick = function(e) { e.stopPropagation(); item.remove(); saveCalendarEventsFromDOM(); triggerAutoSave(); };
+        delBtn.onclick = function(e) { e.stopPropagation(); item.remove(); saveCalendarEventsFromDOM(); syncWeeklyScheduleFromCalendar(); triggerAutoSave(); };
         topRow.appendChild(delBtn);
       }
       item.appendChild(topRow);
@@ -2550,12 +2553,13 @@
       textSpan.className = 'cal-event-text'; 
       textSpan.textContent = text || '새 일정';
       textSpan.contentEditable = isAdmin ? "true" : "false";
-      textSpan.oninput = function() { saveCalendarEventsFromDOM(); triggerAutoSave(); };
+      textSpan.oninput = function() { saveCalendarEventsFromDOM(); syncWeeklyScheduleFromCalendar(); triggerAutoSave(); };
       item.appendChild(textSpan);
 
       container.appendChild(item);
     }
 
+    /* 💡 월간 일정 추가 시 렉 방지 및 주간 일정 실시간 자동 동기화 */
     function addCalendarEventItem(dateKey, time, text) {
       let eventText = text || prompt('일정 내용을 입력하세요:', '새 일정');
       if (eventText === null) return;
@@ -2563,6 +2567,82 @@
       calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
       renderCalendar(); 
       triggerAutoSave();
+    }
+
+    /* 💡 월간 일정 -> 주간 일정 자동 연동 함수 (이번 주 월~일 기준 자동 추출) */
+    function syncWeeklyScheduleFromCalendar() {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 0(일) ~ 6(토)
+      const sun = new Date(now);
+      sun.setDate(now.getDate() - dayOfWeek); // 이번 주 일요일
+      sun.setHours(0,0,0,0);
+
+      const weekDays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+      const autoSchedules = [];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(sun);
+        d.setDate(sun.getDate() + i);
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        const dayNum = d.getDate();
+        const dateKey = `${y}-${m}-${dayNum}`;
+        const dayName = weekDays[d.getDay()];
+
+        const evts = calendarEvents[dateKey] || [];
+        if (evts.length > 0) {
+          evts.forEach(evt => {
+            let ampm = 'PM';
+            let timeStr = evt.time ? evt.time.trim() : '';
+            if (timeStr.includes(':')) {
+              const h = parseInt(timeStr.split(':')[0], 10);
+              ampm = h >= 12 ? 'PM' : 'AM';
+            }
+            autoSchedules.push([dayName, evt.text, ampm, timeStr]);
+          });
+        }
+      }
+
+      // 이번 주에 월간 일정이 등록되어 있다면 주간 일정 목록을 자동으로 채워줌
+      if (autoSchedules.length > 0) {
+        storeData.schedules = autoSchedules;
+        const schList = document.getElementById('schedule-list');
+        if (schList) {
+          schList.innerHTML = storeData.schedules.map(item => {
+            const contentStr = (item[1] || '');
+            const isOffDay = contentStr.includes('휴방') || item[3] === '휴방' || !item[3];
+            return `
+              <div class="item-row schedule-item">
+                <div class="schedule-view-box">
+                  <span class="day-badge">${escapeHtml(item[0])}</span>
+                  <span class="info-text">${escapeHtml(contentStr)}</span>
+                  <span class="sub-text" style="display:${isOffDay ? 'none' : 'inline-block'};">${escapeHtml(item[2])} ${escapeHtml(item[3])}</span>
+                </div>
+                <div class="schedule-edit-box admin-only flex" style="flex-direction:row; align-items:center; width:100%; gap:6px;">
+                  <select class="sch-day-select select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+                    <option value="월요일" ${item[0]==='월요일'?'selected="selected"':''}>월요일</option>
+                    <option value="화요일" ${item[0]==='화요일'?'selected="selected"':''}>화요일</option>
+                    <option value="수요일" ${item[0]==='수요일'?'selected="selected"':''}>수요일</option>
+                    <option value="목요일" ${item[0]==='목요일'?'selected="selected"':''}>목요일</option>
+                    <option value="금요일" ${item[0]==='금요일'?'selected="selected"':''}>금요일</option>
+                    <option value="토요일" ${item[0]==='토요일'?'selected="selected"':''}>토요일</option>
+                    <option value="일요일" ${item[0]==='일요일'?'selected="selected"':''}>일요일</option>
+                  </select>
+                  <span contenteditable="false" class="sch-content-edit info-text" style="font-weight:700; flex:1;" oninput="applyScheduleInputToView(); triggerAutoSave();">${escapeHtml(contentStr)}</span>
+                  <div class="sch-time-zone-edit" style="display:flex; align-items:center; gap:4px;">
+                    <select class="sch-ampm select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
+                      <option value="PM" ${item[2]==='PM'?'selected="selected"':''}>PM</option>
+                      <option value="AM" ${item[2]==='AM'?'selected="selected"':''}>AM</option>
+                    </select>
+                    <input type="text" class="time-text-input sch-time-val" value="${escapeAttr(item[3])}" oninput="applyScheduleInputToView(); this.setAttribute('value', this.value); triggerAutoSave();">
+                  </div>
+                  <button class="del-btn admin-only" onclick="this.closest('.schedule-item').remove(); triggerAutoSave();">×</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
     }
 
     function saveCalendarEventsFromDOM() {
@@ -2582,6 +2662,7 @@
           else delete calendarEvents[dateKey];
         }
       });
+      syncWeeklyScheduleFromCalendar();
     }
 
     function moveMonth(delta) {
