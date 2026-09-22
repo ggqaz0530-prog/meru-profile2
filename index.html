@@ -902,7 +902,7 @@
   <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
   <div class="modal-overlay" id="bulk-paste-modal">
     <div class="modal-card">
-      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
+      <h3>📋 여러 줄 한 번에 붙여넣기</h3>
       <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
       <div class="modal-btns">
         <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
@@ -1417,7 +1417,7 @@
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢ｔ𝐞𝐝ａｙ]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢ｔ𝐞𝐝𝐚ｙ]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -2556,6 +2556,7 @@
       container.appendChild(item);
     }
 
+    /* 💡 월간 일정 추가 렉 방지 최적화 적용된 함수 */
     function addCalendarEventItem(dateKey, time, text) {
       let eventText = text || prompt('일정 내용을 입력하세요:', '새 일정');
       if (eventText === null) return;
