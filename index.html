@@ -604,7 +604,7 @@
 <body>
 
   <!-- 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 -->
-  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('안녕 난 초핸썸몸짱신사메럿이야')">
+  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('초섹시핫바디귀요미핑크공주 메루의 단짝 메럿입니다 🐾')">
     <img src="mascot.png" id="merot-mascot-img" alt="메럿" onerror="this.src='https://api.iconify.design/fluent-emoji:bear.svg'">
   </div>
 
@@ -801,12 +801,12 @@
     <button class="admin-only" onclick="manualSavePage()">💾 실시간 저장</button>
   </div>
 
-  <!-- 📅 모달: 일정 상세보기 (단일 및 다중 일정 통합 출력) -->
+  <!-- 📅 모달: 일정 상세보기 -->
   <div class="modal-overlay" id="event-detail-modal">
     <div class="modal-card">
       <h3 id="evt-detail-date">📅 일정 상세보기</h3>
       <p id="evt-detail-time" style="font-weight:800; color:var(--accent-color); margin-top:4px; margin-bottom:10px; font-size:0.9rem; display:none;"></p>
-      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:12px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; max-height:300px; overflow-y:auto;"></div>
+      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:14px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; white-space:pre-wrap; word-break:break-all; margin-bottom:14px; max-height:280px; overflow-y:auto;"></div>
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('event-detail-modal')">닫기</button></div>
     </div>
   </div>
@@ -980,7 +980,7 @@
     }
 
     function getCleanPlainText(str) {
-      if (!str) return ''; 
+      if (!str) return '';
       return String(str)
         .replace(/<[^>]*>/g, '')
         .replace(/&nbsp;/gi, '')
@@ -1114,8 +1114,8 @@
     }
 
     function openModal(id) {
-      const modal = document.getElementById(id); 
-      if (modal) modal.classList.add('active'); 
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('active');
       updateBodyScrollLock();
     }
 
@@ -1354,7 +1354,7 @@
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢ｔ𝐞𝐝ａｙ]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞𝐝𝐚𝐲]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -1370,7 +1370,7 @@
         ["💡 TMI", "66. 최애 성우가 반쪽하트 내밀어줌"],
         ["💡 TMI", "67. 가장 맛있게 먹은 햄버거 브랜드는 쉑쉑버거 + 밀크쉐이크 + 감자튀김 조합"],
         ["💡 TMI", "68. 맥도날드 맥플러리 + 롯데리아 토네이도 쿠키를 좋아한다"],
-        ["💡 TMI", "69. 메이드의 날 기념 3인 커버곡 공개  【뉴냥이 X 메루 X 뱌링】 愛♡スクリ～ム! (아이스크림) - AiScReam 🍦𝑪𝒐𝒗𝒆𝒓"],
+        ["💡 TMI", "69. 메이드의 날 기념 3인 커버곡 공개  【뉴냥이 X 메루 X 뱌링】 愛♡スクリ~ム! (아이스크림) - AiScReam 🍦𝑪𝒐𝒗𝒆𝒓"],
         ["💡 TMI", "70. OGQ 이모티콘 중에 웰시코기 시리즈 이모티콘을 가장 좋아한다."],
         ["💡 TMI", "71. 6.8 머리 , 눈 색상 변경 ( 흰뚝 카르텔 입성 )"],
         ["💡 TMI", "72. 6.12 일렉기타 연습 1일차! 목표 곡은 케이온 후와후와타임!! 젤 첨으로 연습했던 곡은 드라우닝이랑 HAPPY !"],
@@ -2498,7 +2498,8 @@
       if (eventText === null) return;
       if (!calendarEvents[dateKey]) calendarEvents[dateKey] = [];
       calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
-      renderCalendar(); saveCalendarEventsFromDOM(); triggerAutoSave();
+      renderCalendar(); 
+      triggerAutoSave();
     }
 
     function saveCalendarEventsFromDOM() {
