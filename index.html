@@ -700,7 +700,7 @@
         </div>
 
         <div class="main-col-right">
-          <!-- 💡 주간 일정: '+ 추가' 버튼 제거 및 달력 완전 연동 -->
+          <!-- 💡 주간 일정: '+ 추가' 버튼 제거 및 달력 완전 연동 (지난 날짜 자동 제외) -->
           <div class="card main-card-item" id="card-schedules">
             <div class="section-header">
               <div class="section-title">📅 주간 일정</div>
@@ -726,7 +726,7 @@
           <div class="card main-card-item" id="card-video">
             <div class="section-header">
               <div class="section-title">🎥 대표 영상</div>
-              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️️</button></div>
+              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
             </div>
             <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; border: 1.5px solid var(--card-border); background: #000000;">
               <iframe id="main-video-iframe" src="https://vod.sooplive.com/player/204935355" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: none;"></iframe>
@@ -894,7 +894,7 @@
   <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
   <div class="modal-overlay" id="bulk-paste-modal">
     <div class="modal-card">
-      <h3>📋 여러 줄 한 번에 붙여넣기</h3>
+      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
       <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
       <div class="modal-btns">
         <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
@@ -971,6 +971,17 @@
       }
       const dObj = new Date(clean);
       return isNaN(dObj.getTime()) ? new Date() : dObj;
+    }
+
+    /* 💡 날짜가 오늘(00:00:00)보다 지났는지 판별 (지났으면 true) */
+    function isPastDate(dateStr) {
+      if (!dateStr) return false;
+      const target = parseLocalDate(dateStr);
+      if (!target || isNaN(target.getTime())) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      target.setHours(0, 0, 0, 0);
+      return target.getTime() < today.getTime();
     }
 
     function calculateDDay(dateStr) {
@@ -1451,16 +1462,19 @@
         if (name || url) storeData.links.push([name, url]);
       });
 
-      // 💡 주간 일정은 항상 달력의 최신 이번 주 일정으로 동기화하여 저장 (DOM에서 긁어오지 않아 유령 데이터 생성 차단)
+      // 💡 주간 일정은 달력의 오늘 이후 일정으로 동기화하여 저장
       syncWeeklyScheduleFromCalendar();
 
+      // 💡 기념일 중 날짜가 지난 항목은 제외하고 저장
       const annivItems = document.querySelectorAll('#anniv-list .anniv-item');
       storeData.anniversaries = [];
       annivItems.forEach(item => {
         const datePicker = item.querySelector('.anniv-date-picker');
         const date = (datePicker && datePicker.value) ? datePicker.value : (item.getAttribute('data-date') || '');
         const title = item.querySelector('.anniv-title')?.textContent.trim() || '';
-        if (date || title) storeData.anniversaries.push([date, title]);
+        if ((date || title) && !isPastDate(date)) {
+          storeData.anniversaries.push([date, title]);
+        }
       });
 
       const mcItems = document.querySelectorAll('#mc-server-list .mc-tag-item');
@@ -1633,9 +1647,16 @@
         `).join('');
       }
 
+      // 💡 기념일: 날짜가 지난 항목은 렌더링에서 제외
       const annivList = document.getElementById('anniv-list');
       if (annivList && Array.isArray(data.anniversaries)) {
-        annivList.innerHTML = data.anniversaries.map(item => {
+        const filteredAnnivs = data.anniversaries.filter(item => {
+          const dStr = (Array.isArray(item) ? item[0] : '') || '';
+          return !isPastDate(dStr);
+        });
+        storeData.anniversaries = filteredAnnivs;
+
+        annivList.innerHTML = filteredAnnivs.map(item => {
           const dStr = (Array.isArray(item) ? item[0] : '') || '';
           const titleStr = (Array.isArray(item) ? item[1] : '') || '';
           return `
@@ -1668,7 +1689,7 @@
 
       populateRestoredData(data);
       updateAllPaginations();
-      syncWeeklyScheduleFromCalendar(); // 💡 주간 일정을 항상 최신 달력 데이터 기준으로 동기화하여 출력
+      syncWeeklyScheduleFromCalendar();
 
       if (getAdminState()) {
         enterAdminMode();
@@ -1839,7 +1860,6 @@
       if (tabId === 'monthly') renderCalendar();
     }
 
-    /* 💡 모달에서 특정 일정을 직접 삭제할 수 있는 함수 (모바일 편의성) */
     function deleteCalendarEvent(dateKey, index) {
       if (!calendarEvents[dateKey]) return;
       calendarEvents[dateKey].splice(index, 1);
@@ -1847,7 +1867,7 @@
         delete calendarEvents[dateKey];
       }
       renderCalendar();
-      openDayEventsModal(dateKey); // 모달 화면 새로고침
+      openDayEventsModal(dateKey);
       triggerAutoSave();
     }
 
@@ -2199,6 +2219,13 @@
       if (!parent) return;
       const selectedDate = inputEl.value;
       if (!selectedDate) return;
+
+      if (isPastDate(selectedDate)) {
+        parent.remove();
+        triggerAutoSave();
+        return;
+      }
+
       inputEl.setAttribute('value', selectedDate);
       parent.setAttribute('data-date', selectedDate);
       const parts = formatYMD(selectedDate).split('-');
@@ -2210,7 +2237,13 @@
     function refreshAllDDay() {
       document.querySelectorAll('.anniv-item').forEach(item => {
         const dateStr = item.getAttribute('data-date');
-        if (dateStr) item.querySelector('.dday-badge').textContent = calculateDDay(dateStr);
+        if (dateStr) {
+          if (isPastDate(dateStr)) {
+            item.remove();
+          } else {
+            item.querySelector('.dday-badge').textContent = calculateDDay(dateStr);
+          }
+        }
       });
     }
 
@@ -2352,7 +2385,6 @@
         calBody.appendChild(cell);
       }
       
-      // 💡 달력 갱신 시 주간 일정을 항상 100% 실시간 연동
       syncWeeklyScheduleFromCalendar();
     }
 
@@ -2404,16 +2436,16 @@
       triggerAutoSave();
     }
 
-    /* 💡 [핵심 해결] 월간 일정 -> 주간 일정 완전 동기화 함수
-       (이번 주 월요일 ~ 일요일 기준 7일간의 달력 일정을 빈틈없이 수집) */
+    /* 💡 주간 일정 동기화: 이번 주 월요일~일요일 중 오늘(00:00:00) 이전 날짜의 일정은 제외 */
     function syncWeeklyScheduleFromCalendar() {
       const now = new Date();
-      const currentDay = now.getDay(); // 0(일), 1(월), ..., 6(토)
-      // 한국 표준 주간 기준: 이번 주 월요일부터 일요일까지
+      const todayMidnight = new Date(now);
+      todayMidnight.setHours(0, 0, 0, 0);
+
+      const currentDay = now.getDay();
       const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() + distanceToMonday);
-      monday.setHours(0, 0, 0, 0);
+      const monday = new Date(todayMidnight);
+      monday.setDate(todayMidnight.getDate() + distanceToMonday);
 
       const weekDays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
       const autoSchedules = [];
@@ -2421,13 +2453,16 @@
       for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
+
+        // 날짜가 지난 일정(오늘 00:00:00보다 이전)은 주간 일정에서 제외
+        if (d.getTime() < todayMidnight.getTime()) continue;
+
         const y = d.getFullYear();
         const m = d.getMonth() + 1;
         const dayNum = d.getDate();
         const dateKey = `${y}-${m}-${dayNum}`;
         const dayName = weekDays[d.getDay()];
 
-        // 💡 dateKey 형식(2026-8-21 및 2026-08-21 둘 다 호환 확인)
         const evts = calendarEvents[dateKey] || calendarEvents[formatYMD(dateKey)] || [];
         if (evts.length > 0) {
           evts.forEach(evt => {
@@ -2442,13 +2477,12 @@
         }
       }
 
-      // 💡 [중요] 일정이 0개(전부 삭제)여도 이전 스케줄이 남지 않도록 무조건 덮어씀
       storeData.schedules = autoSchedules;
 
       const schList = document.getElementById('schedule-list');
       if (schList) {
         if (autoSchedules.length === 0) {
-          schList.innerHTML = '<div style="text-align:center; padding:22px 0; color:var(--tab-text-color); font-weight:700; font-size:0.88rem;">📅 이번 주 예정된 방송 일정이 없습니다.</div>';
+          schList.innerHTML = '<div style="text-align:center; padding:22px 0; color:var(--tab-text-color); font-weight:700; font-size:0.88rem;">📅 남은 주간 방송 일정이 없습니다.</div>';
         } else {
           schList.innerHTML = autoSchedules.map(item => {
             const contentStr = (item[1] || '');
