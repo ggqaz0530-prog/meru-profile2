@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MY LOVELY PROFILE</title>
 
   <!-- Firebase SDK 라이브러리 추가 -->
@@ -48,10 +48,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html {
-      overflow-x: clip;
-    }
-
     body {
       background-color: var(--bg-color);
       background-image: 
@@ -66,7 +62,6 @@
       min-height: 100vh;
       opacity: 1;
       position: relative;
-      overflow-x: clip;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -98,7 +93,7 @@
     }
 
     @media (max-width: 768px) {
-      .floating-merot-mascot { width: 72px; bottom: 78px; right: 12px; }
+      .floating-merot-mascot { width: 75px; bottom: 85px; right: 14px; }
     }
 
     body.modal-open {
@@ -107,24 +102,22 @@
 
     .container {
       width: 100%;
-      max-width: 1380px;
+      max-width: 1280px;
       display: flex;
       flex-direction: column;
       gap: 18px;
       position: relative;
       z-index: 1;
-      min-width: 0;
     }
 
     .search-container {
       width: 100%;
-      max-width: 760px;
+      max-width: 820px;
       margin: 0 auto;
       position: relative;
       display: flex;
       gap: 8px;
       align-items: center;
-      min-width: 0;
     }
 
     .search-input-wrapper {
@@ -133,16 +126,14 @@
       background: var(--card-bg);
       border: 3px solid var(--card-border);
       border-radius: 24px;
-      padding: 6px 14px;
+      padding: 6px 16px;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-      gap: 8px;
+      gap: 10px;
       flex: 1;
-      min-width: 0;
     }
 
     .search-input-wrapper input {
       flex: 1;
-      min-width: 0;
       border: none;
       outline: none;
       font-size: 0.92rem;
@@ -167,7 +158,6 @@
       cursor: pointer;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
       white-space: nowrap;
-      flex-shrink: 0;
       transition: transform 0.2s, background 0.2s;
     }
     .dark-mode-btn:hover { transform: scale(1.05); background: var(--item-bg); }
@@ -176,11 +166,10 @@
       background: transparent;
       border: none;
       color: var(--tab-text-color);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       cursor: pointer;
       display: none;
-      padding: 0 4px;
     }
 
     .search-results-dropdown {
@@ -218,8 +207,8 @@
     }
 
     .search-result-item:hover { opacity: 0.85; }
-    .search-result-text { font-size: 0.88rem; font-weight: 700; color: var(--text-color); word-break: break-word; min-width: 0; }
-    .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; background: var(--accent-color); color: #ffffff; white-space: nowrap; flex-shrink: 0; }
+    .search-result-text { font-size: 0.88rem; font-weight: 700; color: var(--text-color); word-break: break-all; }
+    .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; background: var(--accent-color); color: #ffffff; white-space: nowrap; }
 
     @keyframes highlightPulse {
       0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 77, 115, 0.8); }
@@ -237,14 +226,14 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
       gap: 6px;
       width: 100%;
-      max-width: 760px;
+      max-width: 820px;
       margin: 0 auto;
       flex-wrap: wrap;
     }
 
     .tab-btn {
       flex: 1;
-      min-width: 100px;
+      min-width: 105px;
       padding: 10px 12px;
       border: none;
       background: transparent;
@@ -265,12 +254,13 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .tab-content { display: none; flex-direction: column; gap: 18px; width: 100%; min-width: 0; }
+    .tab-content { display: none; flex-direction: column; gap: 18px; width: 100%; }
     .tab-content.active { display: flex; }
 
     #tab-home { max-width: 1180px; margin: 0 auto; }
     #tab-profile { max-width: 820px; margin: 0 auto; }
-    #tab-monthly { max-width: 1380px; margin: 0 auto; }
+    #tab-monthly { max-width: 100%; }
+    #tab-closet { max-width: 1180px; margin: 0 auto; }
     #tab-secret { max-width: 680px; margin: 0 auto; }
 
     /* ==================== 🏠 홈 시트 레이아웃 & 사진 최적화 ==================== */
@@ -299,12 +289,11 @@
       display: block;
     }
     .home-hero-empty {
-      padding: 48px 16px;
+      padding: 54px 20px;
       text-align: center;
       color: var(--tab-text-color);
       font-weight: 800;
-      font-size: 0.92rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
     }
     .home-photo-edit-box {
       display: none !important;
@@ -340,7 +329,6 @@
     }
     .size-slider-row input[type="range"] {
       flex: 1;
-      min-width: 0;
       accent-color: var(--accent-color);
       cursor: pointer;
     }
@@ -461,7 +449,6 @@
       position: relative;
       width: 100%;
       max-width: 100%;
-      min-width: 0;
       overflow: hidden;
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
@@ -488,7 +475,6 @@
       position: relative;
       width: var(--profile-img-size);
       height: var(--profile-img-size);
-      max-width: 100%;
       margin: 0 auto 18px;
       border-radius: 50%;
     }
@@ -531,8 +517,8 @@
       border: 1.5px solid var(--item-border);
       border-radius: 14px;
     }
-    .profile h1 { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); margin-bottom: 6px; word-break: break-word; }
-    .profile-bio { font-size: 0.92rem; color: var(--text-color); line-height: 1.6; text-align: center; min-height: 30px; white-space: pre-wrap; word-break: break-word; width: 100%; margin-bottom: 16px; }
+    .profile h1 { font-size: 1.5rem; font-weight: 800; color: var(--accent-color); margin-bottom: 6px; word-break: break-all; }
+    .profile-bio { font-size: 0.92rem; color: var(--text-color); line-height: 1.6; text-align: center; min-height: 30px; white-space: pre-wrap; word-break: break-all; width: 100%; margin-bottom: 16px; }
 
     .profile-info-grid {
       display: grid;
@@ -563,7 +549,7 @@
     }
     .info-box-item.full-width { grid-column: span 2; }
     .info-box-label { font-size: 0.78rem; font-weight: 800; color: var(--accent-color); background: var(--card-bg); padding: 4px 10px; border-radius: 12px; white-space: nowrap; outline: none; flex: 0 0 auto; border: 1px solid var(--item-border); }
-    .info-box-val { font-size: 0.85rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; }
+    .info-box-val { font-size: 0.85rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
 
     #first-stream-text { white-space: nowrap !important; flex-shrink: 0 !important; }
     body.admin-mode #first-stream-picker { width: 95px !important; padding: 2px 3px !important; font-size: 0.72rem !important; border-radius: 8px !important; }
@@ -777,7 +763,7 @@
 
     .link-anchor { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; width: 100%; text-decoration: none; color: var(--accent-color); font-weight: 700; font-size: 0.92rem; cursor: pointer; min-width: 0; }
     .link-anchor:hover { background: var(--item-bg); }
-    .link-name { min-width: 0; word-break: break-word; }
+    .link-name { min-width: 0; word-break: break-all; }
     body.admin-mode .link-anchor { display: none !important; }
 
     .link-edit-box { width: 100%; padding: 4px 0; display: flex; flex-direction: column; gap: 6px; }
@@ -787,6 +773,118 @@
 
     .anniv-date { font-weight: 800; font-size: 0.82rem; padding: 6px 12px; border-radius: 20px; background: #ffecb3; color: #d97706; white-space: nowrap; flex: 0 0 auto; }
     .dday-badge { font-weight: 800; font-size: 0.78rem; padding: 5px 10px; border-radius: 14px; background: var(--accent-color); color: #ffffff; min-width: 50px; text-align: center; flex: 0 0 auto; }
+
+    /* ==================== 👗 메루의옷장 가로형 그리드 + 줄바꿈 + 페이지네이션 ==================== */
+    .closet-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      width: 100%;
+    }
+    @media (max-width: 960px) {
+      .closet-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .closet-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+    }
+
+    .closet-slot-card {
+      background: var(--item-bg);
+      border: 2px solid var(--item-border);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      transition: transform 0.18s ease, border-color 0.18s ease;
+      min-width: 0;
+    }
+    .closet-slot-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-color);
+    }
+    .closet-photo-box {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--card-bg);
+      border-bottom: 1.5px solid var(--item-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .closet-photo-box img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      object-position: center center;
+      border-radius: 12px;
+      display: block;
+    }
+    .closet-photo-empty {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--tab-text-color);
+      text-align: center;
+      line-height: 1.45;
+      padding: 8px;
+    }
+    .closet-body {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .closet-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .closet-title {
+      font-size: 0.88rem;
+      font-weight: 900;
+      color: var(--accent-color);
+      word-break: break-word;
+      min-width: 0;
+    }
+    .closet-tags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 22px;
+    }
+    .closet-tag-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      background: var(--card-bg);
+      border: 1.5px solid var(--item-border);
+      padding: 3px 8px;
+      border-radius: 10px;
+      word-break: break-all;
+    }
+    .closet-tag-raw {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-color);
+      background: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      padding: 5px 8px;
+      border-radius: 10px;
+      word-break: break-all;
+    }
 
     /* ==================== 📸 메루의비밀계정 (인스타 다중사진 캐러셀 + 페이지네이션) ==================== */
     .ig-feed-wrapper {
@@ -976,15 +1074,22 @@
       align-items: center;
       gap: 5px;
       font-weight: 800;
-      padding: 3px 6px;
-      border-radius: 10px;
+      padding: 4px 8px;
+      border-radius: 12px;
       transition: transform 0.15s, background 0.15s;
+      touch-action: manipulation;
+      user-select: none;
     }
     .ig-icon-btn:hover {
       transform: scale(1.1);
       background: var(--card-bg);
     }
-    .ig-icon-btn.liked { color: var(--accent-color); }
+    .ig-icon-btn:active {
+      transform: scale(0.94);
+    }
+    .ig-icon-btn.liked {
+      color: var(--accent-color);
+    }
     .ig-body-box {
       padding: 4px 16px 16px;
       display: flex;
@@ -1097,21 +1202,7 @@
       cursor: not-allowed;
     }
 
-    /* ==================== 📅 월간 달력 + 👗 메루의 옷장 레이아웃 ==================== */
-    .monthly-split-layout {
-      display: grid;
-      grid-template-columns: 1.45fr 1fr;
-      gap: 18px;
-      align-items: start;
-      width: 100%;
-    }
-
-    @media (max-width: 1080px) {
-      .monthly-split-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    /* ==================== 📅 월간 달력 레이아웃 ==================== */
     .calendar-container { 
       width: 100%; 
       overflow-x: hidden; 
@@ -1134,7 +1225,7 @@
       background: var(--item-bg); 
       border: 2px solid var(--item-border); 
       border-radius: 16px; 
-      height: 140px; 
+      height: 150px; 
       padding: 8px; 
       display: flex; 
       flex-direction: column; 
@@ -1174,97 +1265,15 @@
       text-overflow: ellipsis; 
     }
     .cal-event-time:empty:not([contenteditable="true"]) { display: none; }
-    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; min-width: 0; }
+    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; min-width: 0; }
     .cal-event-del { border: none; background: transparent; color: #ffb6c1; font-size: 0.95rem; cursor: pointer; padding: 2px 4px; touch-action: manipulation; user-select: none; }
-
-    /* 👗 메루의 옷장 가로 줄바꿈 그리드 */
-    .closet-horizontal-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      width: 100%;
-    }
-    .closet-slot-card {
-      background: var(--item-bg);
-      border: 2px solid var(--item-border);
-      border-radius: 18px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 0;
-      transition: transform 0.15s, border-color 0.2s;
-    }
-    .closet-slot-card:hover {
-      border-color: var(--accent-color);
-    }
-    .closet-photo-frame {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--card-bg);
-      border: 1.5px solid var(--item-border);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      padding: 6px;
-    }
-    .closet-photo-frame img {
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      object-position: center center;
-      border-radius: 10px;
-      display: block;
-    }
-    .closet-photo-empty {
-      font-size: 0.74rem;
-      font-weight: 700;
-      color: var(--tab-text-color);
-      text-align: center;
-      line-height: 1.4;
-      padding: 6px;
-    }
-    .closet-tags-box {
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: var(--accent-color);
-      background: var(--card-bg);
-      border: 1px solid var(--item-border);
-      border-radius: 10px;
-      padding: 6px 8px;
-      min-height: 30px;
-      word-break: break-word;
-      white-space: pre-wrap;
-      line-height: 1.35;
-    }
-    .closet-admin-controls {
-      display: none !important;
-    }
-    body.admin-mode .closet-admin-controls {
-      display: flex !important;
-      flex-direction: column;
-      gap: 6px;
-      padding-top: 6px;
-      border-top: 1px dashed var(--item-border);
-    }
-
-    @media (max-width: 600px) {
-      .closet-horizontal-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-    }
 
     /* ==================== 📱 모바일 최적화 미디어 쿼리 ==================== */
     @media (max-width: 768px) {
-      body { padding: 14px 6px 110px; }
+      body { padding: 16px 6px 120px; }
       .card { padding: 14px 10px; border-radius: 18px; }
       .sheet-tabs { padding: 4px; border-radius: 18px; gap: 4px; }
-      .tab-btn { min-width: 68px; font-size: 0.74rem; padding: 8px 6px; border-radius: 12px; }
+      .tab-btn { min-width: 64px; font-size: 0.73rem; padding: 8px 6px; border-radius: 12px; }
       .calendar-header h2 { font-size: 1.2rem; }
       .cal-nav-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 12px; }
       .ig-carousel-track { height: 320px; }
@@ -1338,12 +1347,12 @@
       .cal-event-del { font-size: 0.85rem !important; padding: 0 2px !important; line-height: 1 !important; }
 
       .url-input, .date-input, .time-text-input, .text-input, .select-input, #global-search-input { font-size: 16px !important; }
-      .admin-bar { max-width: 96vw; padding: 8px 12px; gap: 8px; bottom: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .admin-bar { max-width: 95vw; padding: 8px 12px; gap: 8px; bottom: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
       .admin-bar button { font-size: 0.78rem; }
       .admin-status { font-size: 0.75rem; }
     }
 
-    .info-text { word-break: break-word; overflow-wrap: break-word; min-width: 0; }
+    .info-text { word-break: break-all; overflow-wrap: break-word; min-width: 0; }
     .admin-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4a2830; padding: 10px 22px; border-radius: 30px; display: flex; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0, 0.3); z-index: 1000; align-items: center; }
     .admin-bar button { background: transparent; border: none; color: #ffffff; font-weight: 700; font-size: 0.88rem; cursor: pointer; touch-action: manipulation; user-select: none; }
     .admin-bar button:hover { color: #ff8da1; }
@@ -1391,6 +1400,7 @@
       <button class="tab-btn active" onclick="switchTab(event, 'home')">🏠 홈</button>
       <button class="tab-btn" onclick="switchTab(event, 'profile')">🎀 프로필</button>
       <button class="tab-btn" onclick="switchTab(event, 'monthly')">📅 월간 일정</button>
+      <button class="tab-btn" onclick="switchTab(event, 'closet')">👗 메루의옷장</button>
       <button class="tab-btn" onclick="switchTab(event, 'secret')">🔒 메루의비밀계정</button>
     </div>
 
@@ -1573,52 +1583,52 @@
       </div>
     </div>
 
-    <!-- ==================== 시트 3: 대형 월간 달력 + 👗 메루의 옷 ==================== -->
+    <!-- ==================== 시트 3: 대형 월간 달력 ==================== -->
     <div class="tab-content" id="tab-monthly">
-      <div class="monthly-split-layout">
-        <!-- 좌측: 월간 일정 -->
-        <div class="card calendar-container">
-          <div class="calendar-header">
-            <button class="cal-nav-btn" onclick="moveMonth(-1)">&lt;</button>
-            <h2 id="calendar-title"></h2>
-            <button class="cal-nav-btn" onclick="moveMonth(1)">&gt;</button>
-          </div>
-          <div class="calendar-grid">
-            <div class="cal-day-name" style="color:var(--accent-color);">일</div>
-            <div class="cal-day-name">월</div>
-            <div class="cal-day-name">화</div>
-            <div class="cal-day-name">수</div>
-            <div class="cal-day-name">목</div>
-            <div class="cal-day-name">금</div>
-            <div class="cal-day-name" style="color:var(--accent-color);">토</div>
-          </div>
-          <div class="calendar-grid" id="calendar-body"></div>
+      <div class="card calendar-container">
+        <div class="calendar-header">
+          <button class="cal-nav-btn" onclick="moveMonth(-1)">&lt;</button>
+          <h2 id="calendar-title"></h2>
+          <button class="cal-nav-btn" onclick="moveMonth(1)">&gt;</button>
         </div>
-
-        <!-- 우측: 메루의 옷 (가로 배치 그리드 + 태그 + 사진 최적화 + 페이지네이션) -->
-        <div class="card" id="card-meru-closet">
-          <div class="section-header">
-            <div class="section-title">👗 메루의 옷</div>
-            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-              <span class="admin-only" style="font-size:0.75rem; font-weight:800; color:var(--accent-color);">
-                페이지당
-                <select class="select-input" id="closet-per-page-select" onchange="changeClosetPerPage(this.value)">
-                  <option value="4">4칸</option>
-                  <option value="6" selected>6칸</option>
-                  <option value="9">9칸</option>
-                </select>
-              </span>
-              <button class="add-btn admin-only" onclick="addClosetItem()">+ 옷칸 추가</button>
-            </div>
-          </div>
-
-          <div class="closet-horizontal-grid" id="closet-grid"></div>
-          <div class="pagination-bar" id="closet-pagination-bar"></div>
+        <div class="calendar-grid">
+          <div class="cal-day-name" style="color:var(--accent-color);">일</div>
+          <div class="cal-day-name">월</div>
+          <div class="cal-day-name">화</div>
+          <div class="cal-day-name">수</div>
+          <div class="cal-day-name">목</div>
+          <div class="cal-day-name">금</div>
+          <div class="cal-day-name" style="color:var(--accent-color);">토</div>
         </div>
+        <div class="calendar-grid" id="calendar-body"></div>
       </div>
     </div>
 
-    <!-- ==================== 시트 4: 메루의비밀계정 (인스타그램 컨셉) ==================== -->
+    <!-- ==================== 시트 4: 메루의옷장 ==================== -->
+    <div class="tab-content" id="tab-closet">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">👗 메루의옷장</div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="admin-only" style="font-size:0.78rem; font-weight:800; color:var(--accent-color);">
+              페이지당 칸 수
+              <select class="select-input" id="closet-per-page-select" onchange="changeClosetPerPage(this.value)">
+                <option value="4">4칸</option>
+                <option value="8" selected>8칸</option>
+                <option value="12">12칸</option>
+                <option value="16">16칸</option>
+              </select>
+            </span>
+            <button class="add-btn admin-only" onclick="addClosetItem()">+ 옷장 칸 추가</button>
+          </div>
+        </div>
+
+        <div class="closet-grid" id="closet-grid-list"></div>
+        <div class="pagination-bar" id="closet-pagination-bar"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 5: 메루의비밀계정 (인스타그램 컨셉) ==================== -->
     <div class="tab-content" id="tab-secret">
       <div class="card">
         <div class="section-header">
@@ -1713,25 +1723,10 @@
       return true;
     };
 
-    function toArraySafe(val) {
-      if (Array.isArray(val)) return val;
-      if (val && typeof val === 'object') return Object.values(val);
-      return [];
-    }
-
-    function safeStorageSet(key, value) {
-      try {
-        localStorage.setItem(key, value);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
-      safeStorageSet('is_dark_mode', isDark ? 'true' : 'false');
+      try { localStorage.setItem('is_dark_mode', isDark ? 'true' : 'false'); } catch(e) {}
       const btn = document.getElementById('dark-mode-toggle-btn');
       if (btn) btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
     }
@@ -1756,8 +1751,27 @@
 
     function setAdminState(bool) {
       const str = bool ? 'true' : 'false';
-      safeStorageSet('is_admin_active', str);
+      try { localStorage.setItem('is_admin_active', str); } catch(e) {}
       try { sessionStorage.setItem('is_admin_active', str); } catch(e) {}
+    }
+
+    /* 방문자별 로컬 하트 누름 기록 조회/저장 */
+    function getLikedPostsMap() {
+      try {
+        const raw = localStorage.getItem('meru_liked_secret_posts');
+        const parsed = raw ? JSON.parse(raw) : {};
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+      } catch(e) {
+        return {};
+      }
+    }
+
+    function setPostLikedLocal(postId, liked) {
+      if (!postId) return;
+      const map = getLikedPostsMap();
+      if (liked) map[postId] = true;
+      else delete map[postId];
+      try { localStorage.setItem('meru_liked_secret_posts', JSON.stringify(map)); } catch(e) {}
     }
 
     function formatYMD(dateStr) {
@@ -1997,12 +2011,14 @@
     let isFirebaseSaving = false, autoSaveTimer = null;
     let tempOriginalTheme = { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
 
+    // 비밀계정 페이지네이션 & 캐러셀 상태
     let secretCurrentPage = 1;
     let secretPerPage = 5;
     let secretSlideIndices = {};
 
+    // 옷장 페이지네이션 상태
     let closetCurrentPage = 1;
-    let closetPerPage = 6;
+    let closetPerPage = 8;
 
     let storeData = {
       homePhoto: "",
@@ -2010,7 +2026,7 @@
       profileImgSize: 156,
       sigMaxHeight: 560,
       secretPerPage: 5,
-      closetPerPage: 6,
+      closetPerPage: 8,
       profile: { name: "메루 (MERU)", bio: "초섹시핫바디귀요미핑크공주 메루입니다", img: "" },
       fanCharacter: {
         name: "메럿 (MEROT)",
@@ -2023,11 +2039,6 @@
         link: ""
       },
       signatureBalloonImg: "",
-      closetItems: [
-        { id: "closet-1", img: "", tags: "#핑크코디 #기본룩" },
-        { id: "closet-2", img: "", tags: "#리본룩 #방송의상" },
-        { id: "closet-3", img: "", tags: "#캐주얼 #데일리" }
-      ],
       theme: { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' },
       infoGrid: [
         ["이름", "메루", false], ["나이", "비공개", false], ["생일", "06월 17일", false], ["키 / 몸무게", "201cm / 201KG", false],
@@ -2041,6 +2052,32 @@
       ],
       schedules: [],
       anniversaries: [["2026-11-05", "1000일"]],
+      closetItems: [
+        {
+          id: "closet-1",
+          title: "코디 #1",
+          image: "",
+          tags: "#핑크 #리본 #원피스"
+        },
+        {
+          id: "closet-2",
+          title: "코디 #2",
+          image: "",
+          tags: "#데일리 #후드 #귀요미"
+        },
+        {
+          id: "closet-3",
+          title: "코디 #3",
+          image: "",
+          tags: "#방송룩 #포인트 #러블리"
+        },
+        {
+          id: "closet-4",
+          title: "코디 #4",
+          image: "",
+          tags: "#스페셜 #드레스 #메루룩"
+        }
+      ],
       secretPosts: [
         {
           id: "post-1",
@@ -2060,6 +2097,7 @@
       if (el) el.textContent = text;
     }
 
+    /* 💡 이미지 비율 유지 최적화 리사이즈 (업로드 시 멈춤 방지를 위해 비동기/경량화) */
     function optimizeImageDataUrl(img, maxSide = 1080, quality = 0.82) {
       const ratio = img.width / (img.height || 1);
       let targetW = img.width;
@@ -2412,78 +2450,69 @@
       });
     }
 
-    /* ==================== 👗 메루의 옷 (가로 그리드 + 태그 + 사진 최적화 + 페이지네이션) ==================== */
+    /* ==================== 👗 메루의옷장 로직 ==================== */
+    function normalizeClosetItems(items) {
+      if (!Array.isArray(items)) return [];
+      return items.map((item, idx) => ({
+        id: item.id || `closet-${idx}`,
+        title: item.title || `코디 #${idx + 1}`,
+        image: item.image || '',
+        tags: item.tags || ''
+      }));
+    }
+
+    function parseTagTokens(tagStr) {
+      if (!tagStr) return [];
+      return String(tagStr)
+        .split(/[\s,]+/)
+        .map(t => t.trim())
+        .filter(Boolean)
+        .map(t => t.startsWith('#') ? t : `#${t}`);
+    }
+
     function changeClosetPerPage(val) {
-      closetPerPage = parseInt(val, 10) || 6;
+      closetPerPage = parseInt(val, 10) || 8;
       storeData.closetPerPage = closetPerPage;
       closetCurrentPage = 1;
-      renderMeruCloset();
+      renderClosetGrid();
       triggerAutoSave();
     }
 
     function goToClosetPage(pageNum) {
-      const items = toArraySafe(storeData.closetItems);
+      const items = normalizeClosetItems(storeData.closetItems);
       const totalPages = Math.max(1, Math.ceil(items.length / closetPerPage));
       closetCurrentPage = Math.min(Math.max(1, pageNum), totalPages);
-      renderMeruCloset();
+      renderClosetGrid();
+      const card = document.querySelector('#tab-closet .card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function addClosetItem() {
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-      storeData.closetItems.push({
-        id: `closet-${Date.now()}`,
-        img: "",
-        tags: "#새코디 #메루의옷"
-      });
-      const totalPages = Math.max(1, Math.ceil(storeData.closetItems.length / closetPerPage));
-      closetCurrentPage = totalPages;
-      renderMeruCloset();
-      triggerAutoSave();
-    }
-
-    function deleteClosetItem(idx) {
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-      storeData.closetItems.splice(idx, 1);
-      renderMeruCloset();
-      triggerAutoSave();
-    }
-
-    function handleClosetItemUpload(idx, e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-      if (!storeData.closetItems[idx]) return;
-      requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 900, 0.84, function(compressed) {
-          storeData.closetItems[idx].img = compressed;
-          renderMeruCloset();
-          triggerAutoSave();
-          e.target.value = '';
-        });
+    function syncClosetDOMToStore() {
+      const cards = document.querySelectorAll('#closet-grid-list .closet-slot-card');
+      if (cards.length === 0 || !Array.isArray(storeData.closetItems)) return;
+      cards.forEach(card => {
+        const gIdx = parseInt(card.getAttribute('data-global-idx'), 10);
+        if (isNaN(gIdx) || !storeData.closetItems[gIdx]) return;
+        const titleEl = card.querySelector('.closet-title');
+        const tagRawEl = card.querySelector('.closet-tag-raw');
+        const urlInput = card.querySelector('.closet-url-input');
+        if (titleEl) storeData.closetItems[gIdx].title = titleEl.textContent.trim() || `코디 #${gIdx + 1}`;
+        if (tagRawEl) storeData.closetItems[gIdx].tags = tagRawEl.textContent.trim();
+        if (urlInput && urlInput.value.trim()) storeData.closetItems[gIdx].image = urlInput.value.trim();
       });
     }
 
-    function updateClosetItemUrl(idx, val) {
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-      if (!storeData.closetItems[idx]) return;
-      const clean = val.trim();
-      if (!clean) return;
-      storeData.closetItems[idx].img = clean;
-      renderMeruCloset();
-      triggerAutoSave();
-    }
-
-    function renderMeruCloset() {
-      const gridEl = document.getElementById('closet-grid');
+    function renderClosetGrid() {
+      const gridEl = document.getElementById('closet-grid-list');
       const pagerEl = document.getElementById('closet-pagination-bar');
       if (!gridEl) return;
 
-      storeData.closetItems = toArraySafe(storeData.closetItems);
+      storeData.closetItems = normalizeClosetItems(storeData.closetItems);
       const items = storeData.closetItems;
       const isEditable = getAdminState() || document.body.classList.contains('admin-mode');
 
       if (items.length === 0) {
-        gridEl.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:28px 12px; color:var(--tab-text-color); font-weight:700;">등록된 옷이 없습니다. 관리자 모드에서 옷칸을 추가해보세요.</div>';
+        gridEl.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:32px 12px; color:var(--tab-text-color); font-weight:700;">아직 옷장에 등록된 칸이 없습니다.</div>';
         if (pagerEl) pagerEl.innerHTML = '';
         return;
       }
@@ -2495,29 +2524,39 @@
 
       gridEl.innerHTML = pageItems.map((item, localIdx) => {
         const idx = startIdx + localIdx;
-        const imgSrc = (item.img || '').trim();
-        const tagsText = item.tags || '';
+        const imgSrc = (item.image || '').trim();
+        const tagTokens = parseTagTokens(item.tags);
+
+        const photoHtml = imgSrc
+          ? `<img src="${escapeAttr(imgSrc)}" alt="${escapeAttr(item.title)}" loading="lazy">`
+          : `<div class="closet-photo-empty">👗 사진 없음<br>(업로드/URL 입력)</div>`;
+
+        const chipsHtml = tagTokens.length > 0
+          ? `<div class="closet-tags-wrap">${tagTokens.map(tk => `<span class="closet-tag-chip">${escapeHtml(tk)}</span>`).join('')}</div>`
+          : `<div class="closet-tags-wrap"><span style="font-size:0.72rem; color:var(--tab-text-color); opacity:0.75;">태그 없음</span></div>`;
 
         return `
-          <div class="closet-slot-card" id="closet-card-${idx}" data-closet-idx="${idx}">
-            <div class="closet-photo-frame">
-              ${imgSrc
-                ? `<img src="${escapeAttr(imgSrc)}" alt="메루의 옷 ${idx + 1}" loading="lazy">`
-                : `<div class="closet-photo-empty">👗 옷 사진<br>(자동 최적화)</div>`
-              }
+          <div class="closet-slot-card" id="closet-card-${idx}" data-global-idx="${idx}">
+            <div class="closet-photo-box">
+              ${photoHtml}
             </div>
-
-            <div class="closet-tags-box" contenteditable="${isEditable ? 'true' : 'false'}" oninput="onClosetTagInput(${idx}, this.textContent)">${escapeHtml(tagsText)}</div>
-
-            <div class="closet-admin-controls admin-only">
-              <div style="display:flex; gap:4px; justify-content:space-between; align-items:center;">
-                <label class="add-btn" style="flex:1; text-align:center; padding:4px 6px; font-size:0.74rem; cursor:pointer;">
-                  사진 선택
-                  <input type="file" accept="image/*,image/gif" style="display:none;" onchange="handleClosetItemUpload(${idx}, event)">
-                </label>
-                <button type="button" class="del-btn" onclick="deleteClosetItem(${idx})" title="삭제">×</button>
+            <div class="closet-body">
+              <div class="closet-top-bar">
+                <div class="closet-title" contenteditable="${isEditable ? 'true' : 'false'}" oninput="syncClosetDOMToStore(); triggerAutoSave();">${escapeHtml(item.title)}</div>
+                <button type="button" class="del-btn admin-only" onclick="deleteClosetItem(${idx})" title="칸 삭제">×</button>
               </div>
-              <input type="text" class="url-input" style="padding:5px 7px; font-size:0.76rem;" value="${escapeAttr(imgSrc.startsWith('data:') ? '' : imgSrc)}" placeholder="이미지 URL" oninput="updateClosetItemUrl(${idx}, this.value)">
+
+              ${chipsHtml}
+
+              <div class="closet-tag-raw admin-only" contenteditable="true" data-placeholder="태그 입력 (예: #핑크 #원피스)" oninput="syncClosetDOMToStore(); triggerAutoSave();">${escapeHtml(item.tags)}</div>
+
+              <div class="ig-admin-editor admin-only" style="margin-top:4px; padding-top:6px;">
+                <label class="add-btn" style="text-align:center; cursor:pointer; font-size:0.75rem; padding:4px 8px;">
+                  📷 사진 선택
+                  <input type="file" accept="image/*,image/gif" style="display:none;" onchange="handleClosetItemImageUpload(${idx}, event)">
+                </label>
+                <input type="text" class="url-input closet-url-input" style="font-size:0.76rem; padding:5px 8px;" value="${escapeAttr(imgSrc.startsWith('data:') ? '' : imgSrc)}" placeholder="이미지 URL 입력" oninput="updateClosetItemUrl(${idx}, this.value)">
+              </div>
             </div>
           </div>
         `;
@@ -2527,21 +2566,58 @@
         if (totalPages <= 1) {
           pagerEl.innerHTML = '';
         } else {
-          let html = `<button type="button" class="page-btn" ${closetCurrentPage <= 1 ? 'disabled' : ''} onclick="goToClosetPage(${closetCurrentPage - 1})">&lt;</button>`;
+          let btnsHtml = `<button type="button" class="page-btn" ${closetCurrentPage <= 1 ? 'disabled' : ''} onclick="goToClosetPage(${closetCurrentPage - 1})">&lt;</button>`;
           for (let p = 1; p <= totalPages; p++) {
-            html += `<button type="button" class="page-btn ${p === closetCurrentPage ? 'active' : ''}" onclick="goToClosetPage(${p})">${p}</button>`;
+            btnsHtml += `<button type="button" class="page-btn ${p === closetCurrentPage ? 'active' : ''}" onclick="goToClosetPage(${p})">${p}</button>`;
           }
-          html += `<button type="button" class="page-btn" ${closetCurrentPage >= totalPages ? 'disabled' : ''} onclick="goToClosetPage(${closetCurrentPage + 1})">&gt;</button>`;
-          pagerEl.innerHTML = html;
+          btnsHtml += `<button type="button" class="page-btn" ${closetCurrentPage >= totalPages ? 'disabled' : ''} onclick="goToClosetPage(${closetCurrentPage + 1})">&gt;</button>`;
+          pagerEl.innerHTML = btnsHtml;
         }
       }
     }
 
-    function onClosetTagInput(idx, val) {
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-      if (!storeData.closetItems[idx]) return;
-      storeData.closetItems[idx].tags = val;
+    function addClosetItem() {
+      syncClosetDOMToStore();
+      if (!Array.isArray(storeData.closetItems)) storeData.closetItems = [];
+      const nextNum = storeData.closetItems.length + 1;
+      storeData.closetItems.push({
+        id: `closet-${Date.now()}`,
+        title: `코디 #${nextNum}`,
+        image: "",
+        tags: "#메루룩"
+      });
+      closetCurrentPage = Math.max(1, Math.ceil(storeData.closetItems.length / closetPerPage));
+      renderClosetGrid();
       triggerAutoSave();
+    }
+
+    function deleteClosetItem(idx) {
+      syncClosetDOMToStore();
+      if (!Array.isArray(storeData.closetItems)) return;
+      storeData.closetItems.splice(idx, 1);
+      renderClosetGrid();
+      triggerAutoSave();
+    }
+
+    function updateClosetItemUrl(idx, val) {
+      const clean = (val || '').trim();
+      if (!clean || !storeData.closetItems[idx]) return;
+      storeData.closetItems[idx].image = clean;
+      renderClosetGrid();
+      triggerAutoSave();
+    }
+
+    function handleClosetItemImageUpload(idx, e) {
+      const file = e.target.files[0];
+      if (!file || !storeData.closetItems[idx]) return;
+      requestAnimationFrame(() => {
+        readFileAsOptimizedImage(file, 900, 0.84, function(compressed) {
+          storeData.closetItems[idx].image = compressed;
+          renderClosetGrid();
+          triggerAutoSave();
+          e.target.value = '';
+        });
+      });
     }
 
     function extractStoreDataFromDOM() {
@@ -2599,15 +2675,7 @@
 
       storeData.secretPerPage = secretPerPage;
       storeData.closetPerPage = closetPerPage;
-      storeData.closetItems = toArraySafe(storeData.closetItems);
-
-      document.querySelectorAll('#closet-grid .closet-slot-card').forEach(card => {
-        const cIdx = parseInt(card.getAttribute('data-closet-idx'), 10);
-        if (!isNaN(cIdx) && storeData.closetItems[cIdx]) {
-          const tagEl = card.querySelector('.closet-tags-box');
-          if (tagEl) storeData.closetItems[cIdx].tags = tagEl.textContent.trim();
-        }
-      });
+      syncClosetDOMToStore();
 
       const pBg = document.getElementById('picker-bg')?.value;
       const pAccent = document.getElementById('picker-accent')?.value;
@@ -2650,9 +2718,9 @@
         }
       });
 
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
+      // 현재 보이는 비밀계정 카드들의 텍스트/해시태그/작성자 반영 (누적 likes는 유지)
       const postCards = document.querySelectorAll('#secret-feed-list .ig-post-card');
-      if (postCards.length > 0) {
+      if (postCards.length > 0 && Array.isArray(storeData.secretPosts)) {
         postCards.forEach(card => {
           const globalIdx = parseInt(card.getAttribute('data-global-idx'), 10);
           if (isNaN(globalIdx) || !storeData.secretPosts[globalIdx]) return;
@@ -2668,32 +2736,22 @@
     }
 
     function normalizeSecretPosts(posts) {
-      const arr = toArraySafe(posts);
-      return arr.map((post, i) => {
-        if (!post || typeof post !== 'object') {
-          return {
-            id: `post-${i}`,
-            handle: '@meru_secret',
-            images: [],
-            likes: 0,
-            liked: false,
-            caption: '',
-            tags: '#메루',
-            date: 'TODAY'
-          };
-        }
+      if (!Array.isArray(posts)) return [];
+      const likedMap = getLikedPostsMap();
+      return posts.map((post, i) => {
         let imgs = [];
-        if (post.images) {
-          imgs = toArraySafe(post.images).filter(Boolean);
-        } else if (post.image && String(post.image).trim()) {
-          imgs = [String(post.image).trim()];
+        if (Array.isArray(post.images)) {
+          imgs = post.images.filter(Boolean);
+        } else if (post.image && post.image.trim()) {
+          imgs = [post.image.trim()];
         }
+        const postId = post.id || `post-${i}`;
         return {
-          id: post.id || `post-${i}`,
+          id: postId,
           handle: post.handle || '@meru_secret',
           images: imgs,
-          likes: typeof post.likes === 'number' ? post.likes : (parseInt(post.likes, 10) || 0),
-          liked: !!post.liked,
+          likes: Math.max(0, Number(post.likes ?? 0) || 0),
+          liked: !!likedMap[postId],
           caption: post.caption || '',
           tags: post.tags || '#메루',
           date: post.date || 'TODAY'
@@ -2713,16 +2771,17 @@
         if (sel) sel.value = String(secretPerPage);
       }
       if (data.closetPerPage) {
-        closetPerPage = parseInt(data.closetPerPage, 10) || 6;
+        closetPerPage = parseInt(data.closetPerPage, 10) || 8;
         const cSel = document.getElementById('closet-per-page-select');
         if (cSel) cSel.value = String(closetPerPage);
       }
 
-      if (data.secretPosts) {
-        storeData.secretPosts = normalizeSecretPosts(data.secretPosts);
+      if (Array.isArray(data.closetItems)) {
+        storeData.closetItems = normalizeClosetItems(data.closetItems);
       }
-      if (data.closetItems) {
-        storeData.closetItems = toArraySafe(data.closetItems);
+
+      if (Array.isArray(data.secretPosts)) {
+        storeData.secretPosts = normalizeSecretPosts(data.secretPosts);
       }
 
       if (data.theme) {
@@ -2756,12 +2815,10 @@
       renderHomePhoto();
       renderFanCharAndOgq();
       renderSignatureBalloon();
-      renderMeruCloset();
 
       const grid = document.querySelector('.profile-info-grid');
       if (grid && data.infoGrid) {
-        const infoArr = toArraySafe(data.infoGrid);
-        grid.innerHTML = infoArr.map(item => {
+        grid.innerHTML = data.infoGrid.map(item => {
           const label = item[0];
           const val = item[1];
           const isFullClass = (item.length >= 3) ? (item[2] ? 'full-width' : '') : (['출생','주컨텐츠','좋아하는 게임'].includes(label) ? 'full-width' : '');
@@ -2806,8 +2863,7 @@
 
       const linkList = document.getElementById('link-list');
       if (linkList && data.links) {
-        const linkArr = toArraySafe(data.links);
-        linkList.innerHTML = linkArr.map(item => `
+        linkList.innerHTML = data.links.map(item => `
           <div class="item-row link-item">
             <div class="link-anchor" data-href="${escapeAttr(item[1])}" onclick="handleLinkAnchorClick(this)">
               <span class="link-name">${escapeHtml(item[0])}</span><span>→</span>
@@ -2826,9 +2882,8 @@
       }
 
       const annivList = document.getElementById('anniv-list');
-      if (annivList && data.anniversaries) {
-        const annivArr = toArraySafe(data.anniversaries);
-        const filteredAnnivs = annivArr.filter(item => {
+      if (annivList && Array.isArray(data.anniversaries)) {
+        const filteredAnnivs = data.anniversaries.filter(item => {
           const dStr = (Array.isArray(item) ? item[0] : '') || '';
           return !isPastDate(dStr);
         });
@@ -2853,6 +2908,7 @@
         }).join('');
       }
 
+      renderClosetGrid();
       renderSecretFeed();
       syncWeeklyScheduleFromCalendar();
 
@@ -2863,7 +2919,7 @@
       }
     }
 
-    /* ==================== 📸 비밀계정 다중사진 캐러셀, 방문자 하트 동기화 & 페이지네이션 ==================== */
+    /* ==================== 📸 비밀계정 다중사진 캐러셀 & 실시간 하트 누적 ==================== */
     function changeSecretPerPage(val) {
       secretPerPage = parseInt(val, 10) || 5;
       storeData.secretPerPage = secretPerPage;
@@ -2882,7 +2938,7 @@
     }
 
     function setCarouselSlide(postIdx, slideIdx) {
-      const posts = normalizeSecretPosts(storeData.secretPosts);
+      const posts = storeData.secretPosts || [];
       const post = posts[postIdx];
       if (!post || !Array.isArray(post.images) || post.images.length === 0) return;
       const maxIdx = post.images.length - 1;
@@ -2916,47 +2972,29 @@
         if (isNaN(postIdx)) return;
 
         let startX = 0;
-        let startY = 0;
-        let isTracking = false;
+        let isDragging = false;
 
-        box.addEventListener('touchstart', e => {
+        box.addEventListener('pointerdown', e => {
           if (e.target.closest('.ig-carousel-nav-btn') || e.target.closest('.ig-carousel-dot')) return;
-          if (e.touches.length !== 1) return;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-          isTracking = true;
+          startX = e.clientX;
+          isDragging = true;
         }, { passive: true });
 
-        box.addEventListener('touchend', e => {
-          if (!isTracking) return;
-          isTracking = false;
-          if (!e.changedTouches || e.changedTouches.length === 0) return;
-          const endX = e.changedTouches[0].clientX;
-          const endY = e.changedTouches[0].clientY;
-          const diffX = endX - startX;
-          const diffY = endY - startY;
-
-          if (Math.abs(diffX) > 38 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
-            if (diffX < 0) stepCarouselSlide(postIdx, 1);
-            else stepCarouselSlide(postIdx, -1);
+        box.addEventListener('pointerup', e => {
+          if (!isDragging) return;
+          isDragging = false;
+          const diffX = e.clientX - startX;
+          if (diffX < -40) {
+            stepCarouselSlide(postIdx, 1);
+          } else if (diffX > 40) {
+            stepCarouselSlide(postIdx, -1);
           }
         }, { passive: true });
+
+        box.addEventListener('pointercancel', () => {
+          isDragging = false;
+        }, { passive: true });
       });
-    }
-
-    function getVisitorLikedMap() {
-      try {
-        return JSON.parse(localStorage.getItem('visitor_liked_posts') || '{}') || {};
-      } catch(e) {
-        return {};
-      }
-    }
-
-    function setVisitorLikedPost(postId, isLiked) {
-      const map = getVisitorLikedMap();
-      if (isLiked) map[postId] = true;
-      else delete map[postId];
-      safeStorageSet('visitor_liked_posts', JSON.stringify(map));
     }
 
     function renderSecretFeed() {
@@ -2968,7 +3006,6 @@
       const posts = storeData.secretPosts;
       const avatarSrc = (storeData.profile && storeData.profile.img) ? storeData.profile.img : 'https://via.placeholder.com/40';
       const isEditable = getAdminState() || document.body.classList.contains('admin-mode');
-      const visitorLikedMap = getVisitorLikedMap();
 
       if (posts.length === 0) {
         feedEl.innerHTML = '<div style="text-align:center; padding:32px 12px; color:var(--tab-text-color); font-weight:700;">아직 비밀계정 피드가 없습니다.</div>';
@@ -2987,9 +3024,6 @@
         const hasImgs = imgs.length > 0;
         const activeSlide = Math.min(secretSlideIndices[idx] || 0, Math.max(0, imgs.length - 1));
         secretSlideIndices[idx] = activeSlide;
-
-        const isHeartActive = !!(post.liked || visitorLikedMap[post.id]);
-        const likeCount = typeof post.likes === 'number' ? post.likes : (parseInt(post.likes, 10) || 0);
 
         const mediaHtml = hasImgs
           ? `
@@ -3033,7 +3067,7 @@
                 <img src="${escapeAttr(avatarSrc)}" alt="프로필" class="ig-avatar">
                 <div>
                   <div class="ig-handle" contenteditable="${isEditable ? 'true' : 'false'}">${escapeHtml(post.handle || '@meru_secret')}</div>
-                  <div class="ig-sub-handle">비공개 비밀계정 · 사진 ${imgs.length}장</div>
+                  <div class="ig-sub-handle">비밀계정 피드 · 사진 ${imgs.length}장</div>
                 </div>
               </div>
               <button class="del-btn admin-only" onclick="deleteSecretPost(${idx})">삭제 ×</button>
@@ -3043,8 +3077,8 @@
 
             <div class="ig-actions-row">
               <div class="ig-actions-left">
-                <button type="button" class="ig-icon-btn ${isHeartActive ? 'liked' : ''}" id="secret-like-btn-${idx}" onclick="toggleSecretLike(${idx})" title="하트 누르기">
-                  ${isHeartActive ? '♥' : '♡'} <span id="secret-like-count-${idx}">${likeCount}</span>
+                <button type="button" class="ig-icon-btn ${post.liked ? 'liked' : ''}" id="secret-like-btn-${idx}" onclick="toggleSecretLike(${idx})" title="하트 누르기">
+                  ${post.liked ? '♥' : '♡'} <span id="secret-like-count-${idx}">${post.likes ?? 0}</span>
                 </button>
                 <span style="font-size:1.15rem;">💬</span>
                 <span style="font-size:1.1rem;">✈️</span>
@@ -3093,7 +3127,7 @@
     }
 
     function addSecretPost() {
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
+      if (!Array.isArray(storeData.secretPosts)) storeData.secretPosts = [];
       const now = new Date();
       const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
       storeData.secretPosts.unshift({
@@ -3112,49 +3146,51 @@
     }
 
     function deleteSecretPost(idx) {
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
+      if (!Array.isArray(storeData.secretPosts)) return;
+      const removed = storeData.secretPosts[idx];
+      if (removed && removed.id) setPostLikedLocal(removed.id, false);
       storeData.secretPosts.splice(idx, 1);
       delete secretSlideIndices[idx];
       renderSecretFeed();
       triggerAutoSave();
     }
 
+    /* 방문자 누구나 하트를 누르면 전체 누적 하트 수가 증가하고 모두에게 공유됨 */
     function toggleSecretLike(idx) {
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-      const post = storeData.secretPosts[idx];
+      const post = storeData.secretPosts && storeData.secretPosts[idx];
       if (!post) return;
 
-      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
-      const postKey = post.id || `idx-${idx}`;
+      const currentCount = Math.max(0, Number(post.likes ?? 0) || 0);
+      const nextCount = currentCount + 1;
+      post.likes = nextCount;
+      post.liked = true;
+      setPostLikedLocal(post.id || `post-${idx}`, true);
 
-      if (isAdmin) {
-        post.liked = !post.liked;
-        post.likes = Math.max(0, (parseInt(post.likes, 10) || 0) + (post.liked ? 1 : -1));
-      } else {
-        post.likes = Math.max(0, (parseInt(post.likes, 10) || 0) + 1);
-        setVisitorLikedPost(postKey, true);
-      }
-
+      const countEl = document.getElementById(`secret-like-count-${idx}`);
       const btnEl = document.getElementById(`secret-like-btn-${idx}`);
-      const cntEl = document.getElementById(`secret-like-count-${idx}`);
+      if (countEl) countEl.textContent = String(nextCount);
       if (btnEl) {
         btnEl.classList.add('liked');
-        btnEl.style.transform = 'scale(1.22)';
-        setTimeout(() => { if (btnEl) btnEl.style.transform = ''; }, 160);
+        btnEl.innerHTML = `♥ <span id="secret-like-count-${idx}">${nextCount}</span>`;
       }
-      if (cntEl) cntEl.textContent = String(post.likes);
+
+      try { localStorage.setItem('local_store_data', JSON.stringify(storeData)); } catch(e) {}
 
       if (isFirebaseActive && db) {
-        const nowTimestamp = Date.now();
-        isFirebaseSaving = true;
-        db.ref(`live_profile_json_v3/storeData/secretPosts/${idx}/likes`).set(post.likes)
-          .then(() => db.ref('live_profile_json_v3/updated_at').set(nowTimestamp))
-          .finally(() => {
-            setTimeout(() => { isFirebaseSaving = false; }, 350);
-          });
+        const postRef = db.ref(`live_profile_json_v3/storeData/secretPosts/${idx}/likes`);
+        postRef.transaction(val => {
+          const base = Math.max(0, Number(val ?? currentCount) || 0);
+          return base + 1;
+        }, (error, committed, snapshot) => {
+          if (committed && snapshot) {
+            const syncedLikes = Math.max(0, Number(snapshot.val()) || nextCount);
+            post.likes = syncedLikes;
+            const syncedSpan = document.getElementById(`secret-like-count-${idx}`);
+            if (syncedSpan) syncedSpan.textContent = String(syncedLikes);
+            try { localStorage.setItem('local_store_data', JSON.stringify(storeData)); } catch(e) {}
+          }
+        });
       }
-
-      safeStorageSet('local_store_data', JSON.stringify(storeData));
     }
 
     function addSecretPostImageUrl(idx) {
@@ -3162,8 +3198,7 @@
       if (!inputEl) return;
       const url = inputEl.value.trim();
       if (!url) return;
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-      const post = storeData.secretPosts[idx];
+      const post = storeData.secretPosts && storeData.secretPosts[idx];
       if (!post) return;
       if (!Array.isArray(post.images)) post.images = [];
       post.images.push(url);
@@ -3174,8 +3209,7 @@
     }
 
     function removeSecretPostImage(postIdx, imgIdx) {
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-      const post = storeData.secretPosts[postIdx];
+      const post = storeData.secretPosts && storeData.secretPosts[postIdx];
       if (!post || !Array.isArray(post.images)) return;
       post.images.splice(imgIdx, 1);
       secretSlideIndices[postIdx] = 0;
@@ -3186,8 +3220,7 @@
     function handleSecretPostMultiFile(idx, e) {
       const files = Array.from(e.target.files || []);
       if (files.length === 0) return;
-      storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-      const post = storeData.secretPosts[idx];
+      const post = storeData.secretPosts && storeData.secretPosts[idx];
       if (!post) return;
       if (!Array.isArray(post.images)) post.images = [];
 
@@ -3249,7 +3282,7 @@
       const p1 = document.getElementById('new-pw-input').value.trim(); 
       const p2 = document.getElementById('new-pw-confirm').value.trim();
       if (p1 && p1 === p2) {
-        safeStorageSet('admin_pw', p1);
+        try { localStorage.setItem('admin_pw', p1); } catch(e) {}
         cloudAdminPw = p1;
         if (isFirebaseActive && db) db.ref('live_profile_json_v3/admin_pw').set(p1);
         savePage(true);
@@ -3268,7 +3301,7 @@
       const statusText = document.getElementById('status-text');
       if (statusText) statusText.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
       setEditable(true);
-      renderMeruCloset();
+      renderClosetGrid();
       renderSecretFeed();
       renderCalendar();
     }
@@ -3285,7 +3318,7 @@
       updateStreamDays(true);
       renderFanCharAndOgq();
       renderSignatureBalloon();
-      renderMeruCloset();
+      renderClosetGrid();
       renderSecretFeed();
       renderCalendar();
     }
@@ -3295,7 +3328,8 @@
         '#profile-name', '#profile-bio', '.info-box-label', '.info-box-val',
         '.link-name-edit', '.anniv-title', '.cal-event-time', '.cal-event-text',
         '.ig-handle', '.ig-caption-text', '.ig-tags-text',
-        '#fanchar-name', '#fanchar-desc', '#ogq-title', '.closet-tags-box'
+        '#fanchar-name', '#fanchar-desc', '#ogq-title',
+        '.closet-title', '.closet-tag-raw'
       ];
       document.querySelectorAll(editableSelectors.join(', ')).forEach(el => {
         el.setAttribute('contenteditable', val ? "true" : "false");
@@ -3315,10 +3349,8 @@
 
       const targetTab = document.getElementById('tab-' + tabId);
       if (targetTab) targetTab.classList.add('active');
-      if (tabId === 'monthly') {
-        renderCalendar();
-        renderMeruCloset();
-      }
+      if (tabId === 'monthly') renderCalendar();
+      if (tabId === 'closet') renderClosetGrid();
       if (tabId === 'home') {
         renderHomePhoto();
         syncWeeklyScheduleFromCalendar();
@@ -3373,7 +3405,7 @@
                 ${isAdmin ? `<button onclick="deleteCalendarEvent('${dateKey}', ${idx})" title="삭제" style="background:transparent; border:none; color:#ff4d73; font-weight:900; font-size:1.1rem; cursor:pointer; padding:0 2px; line-height:1;">×</button>` : ''}
               </div>
             </div>
-            <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-word; line-height:1.4;">
+            <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-all; line-height:1.4;">
               ${escapeHtml(evt.text || '내용 없음')}
             </div>
           </div>
@@ -3413,6 +3445,7 @@
       const targets = [
         { id: 'tab-home', tabName: 'home', badge: '🏠 홈' },
         { id: 'tab-profile', tabName: 'profile', badge: '🎀 프로필' },
+        { id: 'tab-closet', tabName: 'closet', badge: '👗 메루의옷장' },
         { id: 'tab-secret', tabName: 'secret', badge: '🔒 비밀계정' }
       ];
 
@@ -3420,7 +3453,7 @@
       targets.forEach(target => {
         const tabEl = document.getElementById(target.id);
         if (!tabEl) return;
-        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .ig-post-card, .fan-char-layout');
+        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .ig-post-card, .fan-char-layout, .closet-slot-card');
         items.forEach((item, idx) => {
           const clone = item.cloneNode(true);
           clone.querySelectorAll('.admin-only, button, select, input').forEach(el => el.remove());
@@ -3429,29 +3462,10 @@
           if (txt && txt.toLowerCase().includes(keyword)) {
             let clean = txt;
             if (clean.length > 45) clean = clean.substring(0, 45) + '...';
-            results.push({
-              text: clean,
-              tabName: target.tabName,
-              badge: target.badge,
-              selector: item.classList.contains('fan-char-layout') ? '.fan-char-layout' : null,
-              itemIdx: idx,
-              isOgq: !!item.closest('#subpanel-ogq')
-            });
+            if (!item.id) item.id = `search-target-${target.tabName}-${idx}`;
+            results.push({ text: clean, tabName: target.tabName, badge: target.badge, elementId: item.id });
           }
         });
-      });
-
-      const closetArr = toArraySafe(storeData.closetItems);
-      closetArr.forEach((cItem, cIdx) => {
-        const tStr = (cItem && cItem.tags ? cItem.tags : '').trim();
-        if (tStr && tStr.toLowerCase().includes(keyword)) {
-          results.push({
-            text: `👗 ${tStr.substring(0, 40)}`,
-            tabName: 'closet',
-            badge: '👗 메루의 옷',
-            closetIdx: cIdx
-          });
-        }
       });
 
       if (calendarEvents && typeof calendarEvents === 'object') {
@@ -3486,32 +3500,14 @@
           div.onclick = function() { 
             if (res.tabName === 'monthly') {
               jumpToCalendarDate(res.dateKey);
-            } else if (res.tabName === 'closet') {
-              jumpToClosetItem(res.closetIdx);
             } else {
-              jumpToSearchResult(res); 
+              jumpToSearchResult(res.tabName, res.elementId); 
             }
           };
           dropdown.appendChild(div);
         });
       }
       dropdown.style.display = 'flex';
-    }
-
-    function jumpToClosetItem(closetIdx) {
-      const dropdown = document.getElementById('search-results-dropdown');
-      if (dropdown) dropdown.style.display = 'none';
-      closetCurrentPage = Math.floor(closetIdx / closetPerPage) + 1;
-      switchTab(null, 'monthly');
-      renderMeruCloset();
-      setTimeout(() => {
-        const card = document.getElementById(`closet-card-${closetIdx}`);
-        if (card) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          card.classList.add('search-highlight');
-          setTimeout(() => card.classList.remove('search-highlight'), 2400);
-        }
-      }, 150);
     }
 
     function jumpToCalendarDate(dateKey) {
@@ -3537,20 +3533,15 @@
       }, 150);
     }
 
-    function jumpToSearchResult(res) {
-      const dropdown = document.getElementById('search-results-dropdown');
-      if (dropdown) dropdown.style.display = 'none';
-      switchTab(null, res.tabName);
+    function jumpToSearchResult(tabName, elementId) {
+      document.getElementById('search-results-dropdown').style.display = 'none';
+      switchTab(null, tabName);
 
       setTimeout(() => {
-        if (res.tabName === 'profile' && res.selector) {
-          switchSubTab(res.isOgq ? 'ogq' : 'fanchar');
-        }
-        const tabEl = document.getElementById('tab-' + res.tabName);
-        if (!tabEl) return;
-        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .ig-post-card, .fan-char-layout');
-        const targetEl = items[res.itemIdx] || null;
+        const targetEl = document.getElementById(elementId);
         if (targetEl) {
+          if (targetEl.closest('#subpanel-ogq')) switchSubTab('ogq');
+          if (targetEl.closest('#subpanel-fanchar')) switchSubTab('fanchar');
           targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           targetEl.classList.add('search-highlight');
           setTimeout(() => targetEl.classList.remove('search-highlight'), 2400);
@@ -3844,10 +3835,12 @@
 
         const nowTimestamp = Date.now();
         const currentPw = getAdminPassword();
-        safeStorageSet('last_updated_at', nowTimestamp.toString());
-        safeStorageSet('applied_cloud_version', nowTimestamp.toString());
-        safeStorageSet('local_store_data', JSON.stringify(storeData));
-        safeStorageSet('local_cal_events', JSON.stringify(calendarEvents));
+        try {
+          localStorage.setItem('last_updated_at', nowTimestamp.toString());
+          localStorage.setItem('applied_cloud_version', nowTimestamp.toString());
+          localStorage.setItem('local_store_data', JSON.stringify(storeData));
+          localStorage.setItem('local_cal_events', JSON.stringify(calendarEvents));
+        } catch(e) {}
 
         if (isFirebaseActive && db) {
           isFirebaseSaving = true;
@@ -4006,8 +3999,8 @@
           const parsed = JSON.parse(localStore);
           if (parsed && typeof parsed === 'object') {
             storeData = { ...storeData, ...parsed };
-            storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-            storeData.closetItems = toArraySafe(storeData.closetItems);
+            if (!Array.isArray(storeData.secretPosts)) storeData.secretPosts = [];
+            if (!Array.isArray(storeData.closetItems)) storeData.closetItems = [];
           }
         }
         if (localCal) {
@@ -4085,12 +4078,12 @@
           if (data) {
             if (data.admin_pw) {
               cloudAdminPw = data.admin_pw;
-              safeStorageSet('admin_pw', data.admin_pw);
+              try { localStorage.setItem('admin_pw', data.admin_pw); } catch(e) {}
             }
             if (data.storeData) {
               storeData = { ...storeData, ...data.storeData };
-              storeData.secretPosts = normalizeSecretPosts(storeData.secretPosts);
-              storeData.closetItems = toArraySafe(storeData.closetItems);
+              if (!Array.isArray(storeData.secretPosts)) storeData.secretPosts = [];
+              if (!Array.isArray(storeData.closetItems)) storeData.closetItems = [];
             }
             if (data.cal_events) {
               try { calendarEvents = JSON.parse(data.cal_events); } catch(e){}
