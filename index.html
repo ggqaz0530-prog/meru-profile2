@@ -62,6 +62,7 @@
       min-height: 100vh;
       opacity: 1;
       position: relative;
+      overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -93,7 +94,7 @@
     }
 
     @media (max-width: 768px) {
-      .floating-merot-mascot { width: 68px; bottom: 72px; right: 12px; }
+      .floating-merot-mascot { width: 64px; bottom: 68px; right: 10px; }
     }
 
     body.modal-open {
@@ -270,7 +271,7 @@
     /* ==================== 🏠 홈 시트 레이아웃 & 사진 최적화 ==================== */
     .home-hero-photo-box {
       width: 100%;
-      min-height: 240px;
+      min-height: 220px;
       max-height: var(--hero-max-height);
       border-radius: 20px;
       overflow: hidden;
@@ -293,11 +294,11 @@
       display: block;
     }
     .home-hero-empty {
-      padding: 54px 20px;
+      padding: 46px 18px;
       text-align: center;
       color: var(--tab-text-color);
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .home-photo-edit-box {
       display: none !important;
@@ -348,22 +349,28 @@
       background: var(--item-bg);
       border: 2px solid var(--item-border);
       border-radius: 16px;
-      min-height: 155px;
-      max-height: 240px;
+      height: 175px;
+      max-height: 175px;
       padding: 10px 8px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      overflow-y: auto;
+      gap: 5px;
+      overflow: hidden;
       min-width: 0;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .weekly-col-cell:hover {
+      border-color: var(--accent-color);
     }
     .weekly-col-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      padding-bottom: 6px;
+      padding-bottom: 5px;
       border-bottom: 1.5px dashed var(--item-border);
+      flex-shrink: 0;
     }
     .weekly-day-label {
       font-size: 0.85rem;
@@ -386,27 +393,41 @@
       background: var(--card-bg);
       border: 1.5px solid var(--item-border);
       border-radius: 10px;
-      padding: 6px 7px;
+      padding: 5px 7px;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
-    .weekly-evt-card:hover {
-      transform: scale(1.02);
+      min-width: 0;
+      flex-shrink: 0;
     }
     .weekly-evt-time {
       font-size: 0.68rem;
       font-weight: 800;
       color: var(--accent-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .weekly-evt-text {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--text-color);
-      word-break: break-word;
-      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+    .weekly-more-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      text-align: center;
+      padding: 2px 4px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--item-border);
+      margin-top: auto;
+      flex-shrink: 0;
     }
     .weekly-empty-text {
       font-size: 0.74rem;
@@ -415,7 +436,7 @@
       opacity: 0.75;
       text-align: center;
       margin: auto 0;
-      padding: 8px 2px;
+      padding: 6px 2px;
     }
 
     /* 홈 하단 2열 (좌: 기념일 / 우: 바로가기) */
@@ -430,18 +451,25 @@
       .home-bottom-grid { grid-template-columns: 1fr; }
       .weekly-grid-7 {
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 4px;
+        gap: 3px;
       }
       .weekly-col-cell {
-        min-height: 120px;
-        padding: 6px 3px;
+        height: 112px;
+        min-height: 112px;
+        max-height: 112px;
+        padding: 5px 2px;
         border-radius: 10px;
+        gap: 2px;
+        overflow: hidden;
       }
-      .weekly-day-label { font-size: 0.72rem; }
-      .weekly-date-label { font-size: 0.62rem; }
-      .weekly-evt-card { padding: 4px 3px; border-radius: 6px; }
-      .weekly-evt-time { font-size: 0.58rem; }
-      .weekly-evt-text { font-size: 0.64rem; line-height: 1.2; }
+      .weekly-col-header { padding-bottom: 3px; }
+      .weekly-day-label { font-size: 0.7rem; }
+      .weekly-date-label { font-size: 0.6rem; }
+      .weekly-evt-card { padding: 2px 3px; border-radius: 6px; gap: 1px; }
+      .weekly-evt-time { font-size: 0.55rem; line-height: 1.1; }
+      .weekly-evt-text { font-size: 0.6rem; line-height: 1.15; letter-spacing: -0.3px; }
+      .weekly-more-badge { font-size: 0.56rem; padding: 1px 2px; }
+      .weekly-empty-text { font-size: 0.62rem; }
     }
 
     .card {
@@ -1068,12 +1096,22 @@
       align-items: center;
       gap: 14px;
     }
+    .ig-like-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      padding: 4px 8px;
+      border-radius: 12px;
+    }
     .ig-icon-btn {
       background: transparent;
       border: none;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      color: var(--text-color);
+      color: var(--accent-color);
       display: inline-flex;
       align-items: center;
       gap: 5px;
@@ -1085,14 +1123,11 @@
       user-select: none;
     }
     .ig-icon-btn:hover {
-      transform: scale(1.1);
+      transform: scale(1.08);
       background: var(--card-bg);
     }
     .ig-icon-btn:active {
-      transform: scale(0.94);
-    }
-    .ig-icon-btn.liked {
-      color: var(--accent-color);
+      transform: scale(0.95);
     }
     .ig-body-box {
       padding: 4px 16px 16px;
@@ -1781,25 +1816,6 @@
       try { sessionStorage.setItem('is_admin_active', str); } catch(e) {}
     }
 
-    /* 방문자별 로컬 하트 누름 기록 조회/저장 */
-    function getLikedPostsMap() {
-      try {
-        const raw = safeLocalStorageGet('meru_liked_secret_posts');
-        const parsed = raw ? JSON.parse(raw) : {};
-        return (parsed && typeof parsed === 'object') ? parsed : {};
-      } catch(e) {
-        return {};
-      }
-    }
-
-    function setPostLikedLocal(postId, liked) {
-      if (!postId) return;
-      const map = getLikedPostsMap();
-      if (liked) map[postId] = true;
-      else delete map[postId];
-      safeLocalStorageSet('meru_liked_secret_posts', JSON.stringify(map));
-    }
-
     function formatYMD(dateStr) {
       if (!dateStr) return '';
       let clean = String(dateStr).trim().replace(/\s+/g, '').replace(/\./g, '-').replace(/\//g, '-');
@@ -2106,7 +2122,6 @@
           handle: "@meru_secret",
           images: [],
           likes: 201,
-          liked: false,
           caption: "여긴 메루만 아는 비밀계정 피드 ✨ 오늘도 몰래 기록 남기는 중!",
           tags: "#메루의비밀계정 #메루 #메럿 #비밀일기",
           date: "TODAY"
@@ -2119,8 +2134,8 @@
       if (el) el.textContent = text;
     }
 
-    /* 💡 이미지 비율 유지 최적화 리사이즈 (업로드 시 멈춤 방지를 위해 비동기/경량화) */
-    function optimizeImageDataUrl(img, maxSide = 1080, quality = 0.82) {
+    /* 💡 이미지 비율 유지 최적화 리사이즈 */
+    function optimizeImageDataUrl(img, maxSide = 960, quality = 0.8) {
       const ratio = img.width / (img.height || 1);
       let targetW = img.width;
       let targetH = img.height;
@@ -2163,10 +2178,11 @@
       reader.readAsDataURL(file);
     }
 
+    /* PC 및 모바일 방문자 모두에게 사진 크기 설정을 일관되게 반영 */
     function applyPhotoDimensions() {
-      const heroH = parseInt(storeData.heroMaxHeight, 10) || 640;
-      const profSize = parseInt(storeData.profileImgSize, 10) || 156;
-      const sigH = parseInt(storeData.sigMaxHeight, 10) || 560;
+      const heroH = Math.min(1100, Math.max(200, parseInt(storeData.heroMaxHeight, 10) || 640));
+      const profSize = Math.min(280, Math.max(100, parseInt(storeData.profileImgSize, 10) || 156));
+      const sigH = Math.min(1000, Math.max(200, parseInt(storeData.sigMaxHeight, 10) || 560));
 
       document.documentElement.style.setProperty('--hero-max-height', `${heroH}px`);
       document.documentElement.style.setProperty('--profile-img-size', `${profSize}px`);
@@ -2174,17 +2190,17 @@
 
       const heroSlider = document.getElementById('hero-height-slider');
       const heroLabel = document.getElementById('hero-height-label');
-      if (heroSlider) heroSlider.value = heroH;
+      if (heroSlider && document.activeElement !== heroSlider) heroSlider.value = heroH;
       if (heroLabel) heroLabel.textContent = `${heroH}px`;
 
       const profSlider = document.getElementById('profile-size-slider');
       const profLabel = document.getElementById('profile-size-label');
-      if (profSlider) profSlider.value = profSize;
+      if (profSlider && document.activeElement !== profSlider) profSlider.value = profSize;
       if (profLabel) profLabel.textContent = `${profSize}px`;
 
       const sigSlider = document.getElementById('sig-height-slider');
       const sigLabel = document.getElementById('sig-height-label');
-      if (sigSlider) sigSlider.value = sigH;
+      if (sigSlider && document.activeElement !== sigSlider) sigSlider.value = sigH;
       if (sigLabel) sigLabel.textContent = `${sigH}px`;
     }
 
@@ -2248,7 +2264,7 @@
       if (!file) return;
       setUploadBadge('home-photo-badge', '⏳ 사진 최적화 중...');
       requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 1280, 0.82, function(compressed) {
+        readFileAsOptimizedImage(file, 1080, 0.8, function(compressed) {
           storeData.homePhoto = compressed;
           ImageStore.saveImage('home_hero_photo', compressed);
           renderHomePhoto();
@@ -2361,7 +2377,7 @@
       if (!file) return;
       setUploadBadge('fanchar-photo-badge', '⏳ 최적화 중...');
       requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 900, 0.85, function(compressed) {
+        readFileAsOptimizedImage(file, 800, 0.8, function(compressed) {
           if (!storeData.fanCharacter) storeData.fanCharacter = { name: '', desc: '', img: '' };
           storeData.fanCharacter.img = compressed;
           ImageStore.saveImage('fanchar_img', compressed);
@@ -2395,7 +2411,7 @@
       if (!file) return;
       setUploadBadge('ogq-photo-badge', '⏳ 최적화 중...');
       requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 900, 0.85, function(compressed) {
+        readFileAsOptimizedImage(file, 800, 0.8, function(compressed) {
           if (!storeData.ogqData) storeData.ogqData = { title: '메루 공식 OGQ 스티커', img: '', link: '' };
           storeData.ogqData.img = compressed;
           ImageStore.saveImage('ogq_img', compressed);
@@ -2462,7 +2478,7 @@
       if (!file) return;
       setUploadBadge('sig-photo-badge', '⏳ 최적화 중...');
       requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 1280, 0.85, function(compressed) {
+        readFileAsOptimizedImage(file, 1080, 0.8, function(compressed) {
           storeData.signatureBalloonImg = compressed;
           ImageStore.saveImage('sig_balloon_img', compressed);
           renderSignatureBalloon();
@@ -2639,7 +2655,7 @@
       const file = e.target.files[0];
       if (!file || !storeData.closetItems[idx]) return;
       requestAnimationFrame(() => {
-        readFileAsOptimizedImage(file, 900, 0.84, function(compressed) {
+        readFileAsOptimizedImage(file, 800, 0.8, function(compressed) {
           storeData.closetItems[idx].image = compressed;
           renderClosetGrid();
           triggerAutoSave();
@@ -2746,7 +2762,6 @@
         }
       });
 
-      // 현재 보이는 비밀계정 카드들의 텍스트/해시태그/작성자 반영 (누적 likes는 유지)
       const postCards = document.querySelectorAll('#secret-feed-list .ig-post-card');
       if (postCards.length > 0 && Array.isArray(storeData.secretPosts)) {
         postCards.forEach(card => {
@@ -2765,7 +2780,6 @@
 
     function normalizeSecretPosts(posts) {
       const list = toArraySafe(posts);
-      const likedMap = getLikedPostsMap();
       return list.map((post, i) => {
         const imgs = toArraySafe(post.images).filter(Boolean);
         if (imgs.length === 0 && post.image && String(post.image).trim()) {
@@ -2777,7 +2791,6 @@
           handle: post.handle || '@meru_secret',
           images: imgs,
           likes: Math.max(0, Number(post.likes ?? 0) || 0),
-          liked: !!likedMap[postId],
           caption: post.caption || '',
           tags: post.tags || '#메루',
           date: post.date || 'TODAY'
@@ -2788,18 +2801,20 @@
     function renderFromJSON(data) {
       if (!data) return;
 
-      if (data.heroMaxHeight) storeData.heroMaxHeight = parseInt(data.heroMaxHeight, 10) || 640;
-      if (data.profileImgSize) storeData.profileImgSize = parseInt(data.profileImgSize, 10) || 156;
-      if (data.sigMaxHeight) storeData.sigMaxHeight = parseInt(data.sigMaxHeight, 10) || 560;
+      if (data.heroMaxHeight !== undefined) storeData.heroMaxHeight = parseInt(data.heroMaxHeight, 10) || 640;
+      if (data.profileImgSize !== undefined) storeData.profileImgSize = parseInt(data.profileImgSize, 10) || 156;
+      if (data.sigMaxHeight !== undefined) storeData.sigMaxHeight = parseInt(data.sigMaxHeight, 10) || 560;
+      applyPhotoDimensions();
+
       if (data.secretPerPage) {
         secretPerPage = parseInt(data.secretPerPage, 10) || 5;
         const sel = document.getElementById('secret-per-page-select');
-        if (sel) sel.value = String(secretPerPage);
+        if (sel && document.activeElement !== sel) sel.value = String(secretPerPage);
       }
       if (data.closetPerPage) {
         closetPerPage = parseInt(data.closetPerPage, 10) || 8;
         const cSel = document.getElementById('closet-per-page-select');
-        if (cSel) cSel.value = String(closetPerPage);
+        if (cSel && document.activeElement !== cSel) cSel.value = String(closetPerPage);
       }
 
       if (data.closetItems !== undefined) {
@@ -2952,7 +2967,7 @@
       }
     }
 
-    /* ==================== 📸 비밀계정 다중사진 캐러셀 & 실시간 하트 누적 ==================== */
+    /* ==================== 📸 비밀계정 다중사진 캐러셀 & 관리자 전용 하트 ==================== */
     function changeSecretPerPage(val) {
       secretPerPage = parseInt(val, 10) || 5;
       storeData.secretPerPage = secretPerPage;
@@ -3057,6 +3072,7 @@
         const hasImgs = imgs.length > 0;
         const activeSlide = Math.min(secretSlideIndices[idx] || 0, Math.max(0, imgs.length - 1));
         secretSlideIndices[idx] = activeSlide;
+        const likeCount = post.likes ?? 0;
 
         const mediaHtml = hasImgs
           ? `
@@ -3093,6 +3109,14 @@
             </div>`
           : '';
 
+        const heartHtml = isEditable
+          ? `<button type="button" class="ig-icon-btn" id="secret-like-btn-${idx}" onclick="adminIncrementSecretLike(${idx})" title="관리자 하트 추가">
+               ♥ <span id="secret-like-count-${idx}">${likeCount}</span>
+             </button>`
+          : `<span class="ig-like-badge" title="관리자 전용 하트">
+               ♥ <span id="secret-like-count-${idx}">${likeCount}</span>
+             </span>`;
+
         return `
           <article class="ig-post-card" id="secret-post-${idx}" data-global-idx="${idx}">
             <div class="ig-post-header">
@@ -3110,9 +3134,7 @@
 
             <div class="ig-actions-row">
               <div class="ig-actions-left">
-                <button type="button" class="ig-icon-btn ${post.liked ? 'liked' : ''}" id="secret-like-btn-${idx}" onclick="toggleSecretLike(${idx})" title="하트 누르기">
-                  ${post.liked ? '♥' : '♡'} <span id="secret-like-count-${idx}">${post.likes ?? 0}</span>
-                </button>
+                ${heartHtml}
                 <span style="font-size:1.15rem;">💬</span>
                 <span style="font-size:1.1rem;">✈️</span>
               </div>
@@ -3168,7 +3190,6 @@
         handle: "@meru_secret",
         images: [],
         likes: 0,
-        liked: false,
         caption: "새 비밀계정 글을 작성해보세요 ✨",
         tags: "#메루의비밀계정 #비밀글",
         date: dateStr
@@ -3180,50 +3201,21 @@
 
     function deleteSecretPost(idx) {
       if (!Array.isArray(storeData.secretPosts)) return;
-      const removed = storeData.secretPosts[idx];
-      if (removed && removed.id) setPostLikedLocal(removed.id, false);
       storeData.secretPosts.splice(idx, 1);
       delete secretSlideIndices[idx];
       renderSecretFeed();
       triggerAutoSave();
     }
 
-    /* 방문자 누구나 하트를 누르면 전체 누적 하트 수가 증가하고 모두에게 공유됨 */
-    function toggleSecretLike(idx) {
+    /* 관리자 전용 하트 클릭 */
+    function adminIncrementSecretLike(idx) {
+      if (!getAdminState() && !document.body.classList.contains('admin-mode')) return;
       const post = storeData.secretPosts && storeData.secretPosts[idx];
       if (!post) return;
-
-      const currentCount = Math.max(0, Number(post.likes ?? 0) || 0);
-      const nextCount = currentCount + 1;
-      post.likes = nextCount;
-      post.liked = true;
-      setPostLikedLocal(post.id || `post-${idx}`, true);
-
+      post.likes = Math.max(0, Number(post.likes ?? 0) || 0) + 1;
       const countEl = document.getElementById(`secret-like-count-${idx}`);
-      const btnEl = document.getElementById(`secret-like-btn-${idx}`);
-      if (countEl) countEl.textContent = String(nextCount);
-      if (btnEl) {
-        btnEl.classList.add('liked');
-        btnEl.innerHTML = `♥ <span id="secret-like-count-${idx}">${nextCount}</span>`;
-      }
-
-      safeLocalStorageSet('local_store_data', JSON.stringify(storeData));
-
-      if (isFirebaseActive && db) {
-        const postRef = db.ref(`live_profile_json_v3/storeData/secretPosts/${idx}/likes`);
-        postRef.transaction(val => {
-          const base = Math.max(0, Number(val ?? currentCount) || 0);
-          return base + 1;
-        }, (error, committed, snapshot) => {
-          if (committed && snapshot) {
-            const syncedLikes = Math.max(0, Number(snapshot.val()) || nextCount);
-            post.likes = syncedLikes;
-            const syncedSpan = document.getElementById(`secret-like-count-${idx}`);
-            if (syncedSpan) syncedSpan.textContent = String(syncedLikes);
-            safeLocalStorageSet('local_store_data', JSON.stringify(storeData));
-          }
-        });
-      }
+      if (countEl) countEl.textContent = String(post.likes);
+      triggerAutoSave();
     }
 
     function addSecretPostImageUrl(idx) {
@@ -3264,7 +3256,7 @@
       const addedUrls = [];
 
       files.forEach(file => {
-        readFileAsOptimizedImage(file, 1080, 0.82, function(compressed) {
+        readFileAsOptimizedImage(file, 960, 0.8, function(compressed) {
           addedUrls.push(compressed);
           processedCount++;
           if (processedCount === files.length) {
@@ -3349,6 +3341,7 @@
       applyLinkData();
       refreshAllDDay();
       updateStreamDays(true);
+      applyPhotoDimensions();
       renderFanCharAndOgq();
       renderSignatureBalloon();
       renderClosetGrid();
@@ -3382,6 +3375,7 @@
 
       const targetTab = document.getElementById('tab-' + tabId);
       if (targetTab) targetTab.classList.add('active');
+      applyPhotoDimensions();
       if (tabId === 'monthly') renderCalendar();
       if (tabId === 'closet') renderClosetGrid();
       if (tabId === 'home') {
@@ -3800,14 +3794,24 @@
           autoSchedules.push([dayName, evt.text || '', ampm, timeStr]);
         });
 
-        const evtsHtml = activeEvts.length > 0
-          ? activeEvts.map(evt => `
-              <div class="weekly-evt-card" onclick="openDayEventsModal('${dateKey}')">
-                ${evt.time && evt.time.trim() ? `<span class="weekly-evt-time">⏰ ${escapeHtml(evt.time.trim())}</span>` : ''}
-                <span class="weekly-evt-text">${escapeHtml(evt.text || '일정')}</span>
-              </div>
-            `).join('')
-          : `<div class="weekly-empty-text">${isPast ? '지난 날' : '일정 없음'}</div>`;
+        const previewLimit = 2;
+        const previewEvts = activeEvts.slice(0, previewLimit);
+        const extraCount = activeEvts.length - previewEvts.length;
+
+        let evtsHtml = '';
+        if (previewEvts.length > 0) {
+          evtsHtml = previewEvts.map(evt => `
+            <div class="weekly-evt-card">
+              ${evt.time && evt.time.trim() ? `<span class="weekly-evt-time">⏰ ${escapeHtml(evt.time.trim())}</span>` : ''}
+              <span class="weekly-evt-text">${escapeHtml(evt.text || '일정')}</span>
+            </div>
+          `).join('');
+          if (extraCount > 0) {
+            evtsHtml += `<div class="weekly-more-badge">+${extraCount}개 더보기</div>`;
+          }
+        } else {
+          evtsHtml = `<div class="weekly-empty-text">${isPast ? '지난 날' : '일정 없음'}</div>`;
+        }
 
         columnsHtml.push(`
           <div class="weekly-col-cell ${isToday ? 'is-today' : ''} ${isPast ? 'is-past' : ''}" onclick="openDayEventsModal('${dateKey}')">
@@ -3879,35 +3883,16 @@
 
         if (isFirebaseActive && db) {
           isFirebaseSaving = true;
-          const rootRef = db.ref('live_profile_json_v3');
-          rootRef.child('storeData/secretPosts').get().then(snap => {
-            const remotePosts = toArraySafe(snap.val());
-            if (Array.isArray(storeData.secretPosts)) {
-              storeData.secretPosts = storeData.secretPosts.map((p, i) => {
-                const remoteP = remotePosts[i];
-                const remoteLikes = remoteP ? Math.max(0, Number(remoteP.likes ?? 0) || 0) : 0;
-                const localLikes = Math.max(0, Number(p.likes ?? 0) || 0);
-                return { ...p, likes: Math.max(remoteLikes, localLikes) };
-              });
-            }
-            return rootRef.set({
-              storeData: storeData,
-              cal_events: JSON.stringify(calendarEvents),
-              admin_pw: currentPw,
-              updated_at: nowTimestamp
-            });
+          db.ref('live_profile_json_v3').set({
+            storeData: storeData,
+            cal_events: JSON.stringify(calendarEvents),
+            admin_pw: currentPw,
+            updated_at: nowTimestamp
           }).then(() => {
             isFirebaseSaving = false;
             if (statusEl && document.body.classList.contains('admin-mode')) statusEl.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
           }).catch(() => {
-            rootRef.set({
-              storeData: storeData,
-              cal_events: JSON.stringify(calendarEvents),
-              admin_pw: currentPw,
-              updated_at: nowTimestamp
-            }).finally(() => {
-              isFirebaseSaving = false;
-            });
+            isFirebaseSaving = false;
           });
         }
 
